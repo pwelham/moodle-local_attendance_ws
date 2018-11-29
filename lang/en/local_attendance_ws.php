@@ -20,8 +20,10 @@
  *
  * @package    local_attendance_ws
  * @author     Peter Welham
- * @copyright  2017, Oxford Brookes University {@link http://www.brookes.ac.uk/}
+ * @copyright  2018, Oxford Brookes University {@link http://www.brookes.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+$string['privacy:metadata'] = 'The Attendance Web Service plugin does not store any personal data.';
 
 $string['pluginname'] = 'Attendance Web Service';
