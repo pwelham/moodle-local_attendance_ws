@@ -277,10 +277,10 @@ class local_attendance_ws_external extends external_api {
     }
 
     public static function get_settings(){
-        $enabled = get_config('local_attendance_ws', 'enabled');
+        $enabled = get_config('local_attendance_ws', 'enable');
         $modulelist = get_config('local_attendance_ws', 'module_list');
         $modulesarray = explode(",", $modulelist);
 
-        return array('enabled' => $enabled,'modulelist' => $modulesarray);
+        return array('enabled' => $enabled, 'modulelist' => $modulesarray);
     }
 }
