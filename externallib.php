@@ -270,12 +270,17 @@ class local_attendance_ws_external extends external_api {
     public static function get_settings_returns() {
         return new external_single_structure(
             array(
-                'result' => new external_value(PARAM_TEXT, 'Result')
+                'enabled' => new external_value(PARAM_BOOL, 'Enabled'),
+                'modulelist' => new external_multiple_structure(new external_value(PARAM_TEXT, 'Module List'))
             )
         );
     }
 
     public static function get_settings(){
-        return array('result' => "These are some settings.");
+        $enabled = get_config('local_attendance_ws', 'enabled');
+        $modulelist = get_config('local_attendance_ws', 'module_list');
+        $modulesarray = explode(",", $modulelist);
+
+        return array('enabled' => $enabled,'modulelist' => $modulesarray);
     }
 }
