@@ -19,14 +19,14 @@
  * Version info
  *
  * @package    local_attendance_ws
- * @author     Peter Welham
- * @copyright  2018, Oxford Brookes University {@link http://www.brookes.ac.uk/}
+ * @author     Emir Kamel
+ * @copyright  2023, Oxford Brookes University {@link http://www.brookes.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018111800;
+$plugin->version = 2018111802;
 
 $plugin->requires = 2012120301;//Optional - minimum version number of Moodle that this plugin requires
 //(Moodle 1.9 = 2007101509; Moodle 2.0 = 2010112400; Moodle 2.1 = 2011070100; Moodle 2.2 = 2011120100; Moodle 2.4 = 2012120301)

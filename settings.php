@@ -19,12 +19,40 @@
  * Standard lib
  *
  * @package    local_attendance_ws
- * @author     Peter Welham
- * @copyright  2017, Oxford Brookes University {@link http://www.brookes.ac.uk/}
+ * @author     Emir Kamel
+ * @copyright  2023, Oxford Brookes University {@link http://www.brookes.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
+//$hidden = $settings->hidden;
+//
+//$settings = new admin_category('obuattendancesettingscat', get_string('pluginname', 'local_attendance_ws'), $hidden);
+//
+//$settingsattendance = new admin_settingpage('attendancesettingsobu', get_string('settings'), 'moodle/site:config');
+//
+//if ($ADMIN->fulltree) {
+//
+//    $plugin = new stdClass();
+//    include($CFG->dirroot.'/local/attendance_ws/version.php');
+//
+//    $a = new stdClass();
+//    $a->version = $plugin->version;
+//
+//    $settingsattendance->add(new admin_setting_heading('obu_attendance_settings', '', get_string('header', 'local_attendance_ws', $a)));
+//
+//    // Security --------------------------------------------------------------------------------.
+//    $settingsattendance->add(new admin_setting_heading('obu_attendance_security', get_string('livesettings', 'local_attendance_ws'),
+//        ''));
+//}
+//
+//$settings->add('obuattendancesettingscat', $settingsattendance);
 
-
+if ($hassiteconfig) {
+    $ADMIN->add("parent_section", new admin_externalpage('obuattendance', "OBU Attendance Admin Component", "$CFG->wwwroot/$CFG->admin/obuattendance.php"));
+    $settings = new admin_settingpage(get_string('pluginname', 'local_attendance_ws'), get_string('plugintitle', 'local_attendance_ws'));
+    $ADMIN->add('localplugins', $settings);
+    $settings->add(new admin_setting_configcheckbox('local_attendance_ws/enable', get_string('enable', 'local_attendance_ws'), get_string('enabledescription', 'local_attendance_ws'), ''));
+    $settings->add(new admin_setting_configtextarea('local_attendance_ws/module_list', get_string('modulelist', 'local_attendance_ws'), get_string('modulelistsettingtext', 'local_attendance_ws'), ''));
+}
