@@ -259,4 +259,23 @@ class local_attendance_ws_external extends external_api {
 
 		return array('result' => $params['sessionid']);
 	}
+
+    public static function get_settings_parameters() {
+        return new external_function_parameters(
+            array(
+            )
+        );
+    }
+
+    public static function get_settings_returns() {
+        return new external_single_structure(
+            array(
+                'result' => new external_value(PARAM_TEXT, 'Result')
+            )
+        );
+    }
+
+    public static function get_settings(){
+        return array('result' => "These are some settings.");
+    }
 }
