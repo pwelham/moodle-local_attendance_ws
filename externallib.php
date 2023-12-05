@@ -71,7 +71,7 @@ class local_attendance_ws_external extends external_api {
 		if (!($course = $DB->get_record('course', array('idnumber' => $params['idnumber'])))) {
 			return array('result' => -2);
 		}
-		
+
 		if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module attendance')))) {
 			return array('result' => -3);
 		}
@@ -164,7 +164,7 @@ class local_attendance_ws_external extends external_api {
 		if (!($session = $DB->get_record('attendance_sessions', array('id' => $params['sessionid'])))) {
 			return array('result' => 0);
 		}
-		
+
 		if (!($cm = get_coursemodule_from_instance('attendance', $session->attendanceid, 0, false))) {
 			return array('result' => -2);
 		}
@@ -234,7 +234,7 @@ class local_attendance_ws_external extends external_api {
 		if (!($session = $DB->get_record('attendance_sessions', array('id' => $params['sessionid'])))) {
 			return array('result' => 0);
 		}
-		
+
 		if (!($cm = get_coursemodule_from_instance('attendance', $session->attendanceid, 0, false))) {
 			return array('result' => -2);
 		}
@@ -279,7 +279,7 @@ class local_attendance_ws_external extends external_api {
     public static function get_settings(){
         $enabled = get_config('local_attendance_ws', 'enable');
         $modulelist = get_config('local_attendance_ws', 'module_list');
-        $modulesarray = explode(",", $modulelist);
+        $modulesarray = array_filter(explode(",", str_replace(" ", "", $modulelist)));
 
         return array('enabled' => $enabled, 'modulelist' => $modulesarray);
     }
