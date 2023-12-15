@@ -26,6 +26,7 @@
 require_once($CFG->libdir . "/externallib.php");
 require_once($CFG->dirroot . "/mod/attendance/renderhelpers.php");
 require_once($CFG->dirroot . "/mod/attendance/classes/structure.php");
+require_once($CFG->dirroot . "/mod/attendance/locallib.php");
 
 class local_attendance_ws_external extends external_api {
 
