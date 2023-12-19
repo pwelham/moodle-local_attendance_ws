@@ -26,31 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-//$hidden = $settings->hidden;
-//
-//$settings = new admin_category('obuattendancesettingscat', get_string('pluginname', 'local_attendance_ws'), $hidden);
-//
-//$settingsattendance = new admin_settingpage('attendancesettingsobu', get_string('settings'), 'moodle/site:config');
-//
-//if ($ADMIN->fulltree) {
-//
-//    $plugin = new stdClass();
-//    include($CFG->dirroot.'/local/attendance_ws/version.php');
-//
-//    $a = new stdClass();
-//    $a->version = $plugin->version;
-//
-//    $settingsattendance->add(new admin_setting_heading('obu_attendance_settings', '', get_string('header', 'local_attendance_ws', $a)));
-//
-//    // Security --------------------------------------------------------------------------------.
-//    $settingsattendance->add(new admin_setting_heading('obu_attendance_security', get_string('livesettings', 'local_attendance_ws'),
-//        ''));
-//}
-//
-//$settings->add('obuattendancesettingscat', $settingsattendance);
-
 if ($hassiteconfig) {
-    $ADMIN->add("parent_section", new admin_externalpage('obuattendance', "OBU Attendance Admin Component", "$CFG->wwwroot/$CFG->admin/obuattendance.php"));
     $settings = new admin_settingpage(get_string('pluginname', 'local_attendance_ws'), get_string('plugintitle', 'local_attendance_ws'));
     $ADMIN->add('localplugins', $settings);
     $settings->add(new admin_setting_configcheckbox('local_attendance_ws/enable', get_string('enable', 'local_attendance_ws'), get_string('enabledescription', 'local_attendance_ws'), ''));
