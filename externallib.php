@@ -27,6 +27,9 @@ require_once($CFG->libdir . "/externallib.php");
 require_once($CFG->dirroot . "/mod/attendance/renderhelpers.php");
 require_once($CFG->dirroot . "/mod/attendance/classes/structure.php");
 require_once($CFG->dirroot . "/mod/attendance/locallib.php");
+require_once($CFG->dirroot . "/course/modlib.php");
+require_once($CFG->dirroot . "/group/lib.php");
+require_once($CFG->dirroot . "/local/obu_timetable_usergroups/lib.php");
 
 class local_attendance_ws_external extends external_api {
 
@@ -35,8 +38,10 @@ class local_attendance_ws_external extends external_api {
 			array(
 				'idnumber' => new external_value(PARAM_TEXT, 'Course ID number'),
 				'group' => new external_value(PARAM_TEXT, 'Group'),
-				'start' => new external_value(PARAM_INT, 'Session start time'),
-				'duration' => new external_value(PARAM_INT, 'Session duration')
+                'start' => new external_value(PARAM_INT, 'Session start time'),
+                'duration' => new external_value(PARAM_INT, 'Session duration'),
+                'semesterName' => new external_value(PARAM_TEXT, 'Semester name'),
+                'semesterInstance' => new external_value(PARAM_INT, 'Semester instance')
 			)
 		);
 	}
@@ -49,7 +54,7 @@ class local_attendance_ws_external extends external_api {
 		);
 	}
 
-	public static function add_session($idnumber, $group, $start, $duration) {
+	public static function add_session($idnumber, $group, $start, $duration, $semesterName, $semesterInstance) {
 		global $DB;
 
 		// Context validation
@@ -61,7 +66,9 @@ class local_attendance_ws_external extends external_api {
 				'idnumber' => $idnumber,
 				'group' => $group,
 				'start' => $start,
-				'duration' => $duration
+                'duration' => $duration,
+                'semesterName' => $semesterName,
+                'semesterInstance' => $semesterInstance
 			)
 		);
 
@@ -73,9 +80,35 @@ class local_attendance_ws_external extends external_api {
 			return array('result' => -2);
 		}
 
-		if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module attendance')))) {
-			return array('result' => -3);
+		if (!$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module attendance'))) {
+
+            list($module, $courseContext) = can_add_moduleinfo($course, 'attendance', 0);
+            self::validate_context($courseContext);
+            require_capability('mod/attendance:addinstance', $courseContext);
+
+            // Populate modinfo object.
+            $moduleinfo = new stdClass();
+            $moduleinfo->modulename = 'attendance';
+            $moduleinfo->module = $module->id;
+
+            $moduleinfo->name = 'Module attendance';
+            $moduleinfo->intro = '';
+            $moduleinfo->introformat = FORMAT_HTML;
+
+            $moduleinfo->section = 0;
+            $moduleinfo->visible = 1;
+            $moduleinfo->visibleoncoursepage = 1;
+            $moduleinfo->cmidnumber = '';
+            $moduleinfo->groupmode = VISIBLEGROUPS;
+            $moduleinfo->groupingid = 0;
+
+            // Add the module to the course.
+            add_moduleinfo($moduleinfo, $course);
 		}
+
+        if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module attendance')))) {
+            return array('result' => -3);
+        }
 
 		if (!($cm = get_coursemodule_from_instance('attendance', $attendance->id, 0, false))) {
 			return array('result' => -4);
@@ -87,16 +120,33 @@ class local_attendance_ws_external extends external_api {
 
 		$session = new stdClass();
 		$session->attendanceid = $attendance->id;
-		$session->groupid = 0;
 		$session->sessdate = $params['start'];
 		$session->duration = $params['duration'];
 		$session->lasttaken = null;
 		$session->lasttakenby = 0;
 		$session->timemodified = time();
+
 		if ($params['group'] == 0) {
+            $session->groupid = 0;
 			$session->description = '';
 		} else {
-			$session->description = 'Group ' . $params['group'];
+            $groupidnumber = get_timetable_usergroup_id($params['group'], $params['semesterInstance']);
+            if (!($group = $DB->get_record('groups', array('courseid'=>$course->id, 'idnumber'=>$groupidnumber)))) {
+                $userGroup = new stdClass();
+                $userGroup->name = get_timetable_usergroup_name($params['group'], $params['semesterName']);
+                $userGroup->idnumber = $groupidnumber;
+                $userGroup->description_editor = FORMAT_HTML;
+                $userGroup->enrolmentkey = '';
+                $userGroup->enablemessaging = '0';
+                $userGroup->id = 0;
+                $userGroup->courseid = $course->id;
+
+                $group = new stdClass();
+                $group->id = groups_create_group($userGroup);
+                $group->name = $userGroup->name;
+            }
+            $session->groupid = $group->id;
+			$session->description = $group->name;
 		}
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
