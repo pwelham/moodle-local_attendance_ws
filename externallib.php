@@ -95,7 +95,7 @@ class local_attendance_ws_external extends external_api {
             $moduleinfo->intro = '';
             $moduleinfo->introformat = FORMAT_HTML;
 
-            $moduleinfo->section = 0;
+            $moduleinfo->section = 1;
             $moduleinfo->visible = 1;
             $moduleinfo->visibleoncoursepage = 1;
             $moduleinfo->cmidnumber = '';
