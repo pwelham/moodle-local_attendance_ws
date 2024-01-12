@@ -106,13 +106,15 @@ class local_attendance_ws_external extends external_api {
             add_moduleinfo($moduleinfo, $course);
 		}
 
-        if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module attendance')))) {
+        if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance')))) {
             return array('result' => -3);
         }
 
 		if (!($cm = get_coursemodule_from_instance('attendance', $attendance->id, 0, false))) {
 			return array('result' => -4);
 		}
+
+        $pluginconfig = get_config('attendance');
 
 		// Capability checking
 		$context = context_module::instance($cm->id);
@@ -150,12 +152,28 @@ class local_attendance_ws_external extends external_api {
 		}
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
-		if (!empty(get_config('attendance', 'studentscanmark'))) { // Students will be able to mark their own attendance
-			$session->studentscanmark = 1;
-		} else {
-			$session->studentscanmark = 0;
-		}
 		$session->caleventid = 0;
+        if (isset($pluginconfig->studentscanmark_default)) {
+            $session->studentscanmark = $pluginconfig->studentscanmark_default;
+        }
+        if (isset($pluginconfig->randompassword_default)) {
+            $session->randompassword = $pluginconfig->randompassword_default;
+        }
+        if (isset($pluginconfig->includeqrcode_default)) {
+            $session->includeqrcode = $pluginconfig->includeqrcode_default;
+        }
+        if (isset($pluginconfig->autoassignstatus)) {
+            $session->autoassignstatus = $pluginconfig->autoassignstatus;
+        }
+        if (isset($pluginconfig->allowupdatestatus_default)) {
+            $session->allowupdatestatus = $pluginconfig->allowupdatestatus_default;
+        }
+        if (isset($pluginconfig->rotateqrcode_default)) {
+            $session->rotateqrcode = $pluginconfig->rotateqrcode_default;
+        }
+        if (isset($pluginconfig->automark_default)) {
+            $session->automark = $pluginconfig->automark_default;
+        }
 
 		$session->id = $DB->insert_record('attendance_sessions', $session);
 		attendance_create_calendar_event($session);
