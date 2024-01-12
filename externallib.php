@@ -80,7 +80,7 @@ class local_attendance_ws_external extends external_api {
 			return array('result' => -2);
 		}
 
-		if (!$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module attendance'))) {
+		if (!$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'))) {
 
             list($module, $courseContext) = can_add_moduleinfo($course, 'attendance', 0);
             self::validate_context($courseContext);
@@ -91,7 +91,7 @@ class local_attendance_ws_external extends external_api {
             $moduleinfo->modulename = 'attendance';
             $moduleinfo->module = $module->id;
 
-            $moduleinfo->name = 'Module attendance';
+            $moduleinfo->name = 'Module Attendance';
             $moduleinfo->intro = '';
             $moduleinfo->introformat = FORMAT_HTML;
 
@@ -127,8 +127,8 @@ class local_attendance_ws_external extends external_api {
 		$session->lasttaken = null;
 		$session->lasttakenby = 0;
 		$session->timemodified = time();
-
-		if ($params['group'] == 0) {
+        
+		if ($params['group'] == '0') {
             $session->groupid = 0;
 			$session->description = '';
 		} else {
