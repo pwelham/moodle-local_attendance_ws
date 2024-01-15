@@ -181,6 +181,14 @@ class local_attendance_ws_external extends external_api {
             $session->studentsearlyopentime = $pluginconfig->studentsearlyopentime;
         }
 
+        if (!empty($session->randompassword)) {
+            $session->studentpassword = attendance_random_string();
+        }
+        if (!empty($session->rotateqrcode)) {
+            $session->studentpassword = attendance_random_string();
+            $session->rotateqrcodesecret = attendance_random_string();
+        }
+
 		$session->id = $DB->insert_record('attendance_sessions', $session);
 		attendance_create_calendar_event($session);
 
