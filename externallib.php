@@ -127,7 +127,7 @@ class local_attendance_ws_external extends external_api {
 		$session->lasttaken = null;
 		$session->lasttakenby = 0;
 		$session->timemodified = time();
-        
+
 		if ($params['group'] == '0') {
             $session->groupid = 0;
 			$session->description = '';
@@ -152,7 +152,10 @@ class local_attendance_ws_external extends external_api {
 		}
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
-		$session->caleventid = 0;
+        $session->calendarevent = 0;
+        if (isset($pluginconfig->calendarevent_default)) {
+            $session->caleventid = $pluginconfig->calendarevent_default;
+        }
         if (isset($pluginconfig->studentscanmark_default)) {
             $session->studentscanmark = $pluginconfig->studentscanmark_default;
         }
@@ -173,6 +176,9 @@ class local_attendance_ws_external extends external_api {
         }
         if (isset($pluginconfig->automark_default)) {
             $session->automark = $pluginconfig->automark_default;
+        }
+        if (isset($pluginconfig->studentsearlyopentime)) {
+            $session->studentsearlyopentime = $pluginconfig->studentsearlyopentime;
         }
 
 		$session->id = $DB->insert_record('attendance_sessions', $session);
