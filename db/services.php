@@ -46,7 +46,15 @@ $functions = array(
 		'description' => 'Deletes an attendance session with the given ID. Returns a result code.',
 		'type'        => 'write',
 		'capabilities'=> 'mod/attendance:manageattendances'
-	)
+	),
+    'local_attendance_ws_get_settings' => array(
+        'classname'   => 'local_attendance_ws_external',
+        'methodname'  => 'get_settings',
+        'classpath'   => 'local/attendance_ws/externallib.php',
+        'description' => 'Gets the settings and gives them to the API caller.',
+        'type'        => 'read',
+        'capabilities'=> 'mod/attendance:manageattendances'
+    )
 );
 
 // Define the services to install as pre-build services.
@@ -56,7 +64,8 @@ $services = array(
 		'functions' => array(
 			'local_attendance_ws_add_session',
 			'local_attendance_ws_update_session',
-			'local_attendance_ws_delete_session'
+			'local_attendance_ws_delete_session',
+            'local_attendance_ws_get_settings'
 		),
 		'restrictedusers' => 1,
 		'enabled' => 1

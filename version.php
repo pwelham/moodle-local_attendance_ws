@@ -19,22 +19,17 @@
  * Version info
  *
  * @package    local_attendance_ws
- * @author     Peter Welham
- * @copyright  2018, Oxford Brookes University {@link http://www.brookes.ac.uk/}
+ * @author     Emir Kamel
+ * @copyright  2023, Oxford Brookes University {@link http://www.brookes.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2018111800;
+$plugin->component = 'local_attendance_ws';
+$plugin->version = 2024011600;
+$plugin->requires = 2012120301;
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release = 'v1.1.0'; //Optional - Human-readable version name
+$plugin->dependencies = array('local_obu_timetable_usergroups' => 2024010800);
 
-$plugin->requires = 2012120301;//Optional - minimum version number of Moodle that this plugin requires
-//(Moodle 1.9 = 2007101509; Moodle 2.0 = 2010112400; Moodle 2.1 = 2011070100; Moodle 2.2 = 2011120100; Moodle 2.4 = 2012120301)
-
-$plugin->component = 'local_attendance_ws'; // Full name of the plugin (used for diagnostics): plugintype_pluginname
-
-$plugin->maturity = MATURITY_STABLE;//Optional - how stable the plugin is:
-//MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC, MATURITY_STABLE (Moodle 2.0 and above)
-
-$plugin->release = 'v1.0.1'; //Optional - Human-readable version name
-?>
