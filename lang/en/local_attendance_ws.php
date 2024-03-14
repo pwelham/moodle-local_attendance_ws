@@ -26,4 +26,14 @@
 
 $string['privacy:metadata'] = 'The Attendance Web Service plugin does not store any personal data.';
 
-$string['pluginname'] = 'Attendance Web Service';
+$string['pluginname'] = 'attendance_ws';
+$string['plugintitle'] = 'OBU Attendance';
+$string['header'] = 'You are using OBU Attendance Plugin version {$a->version}.';
+$string['livesettings'] = 'Live Import Settings';
+$string['enable'] = 'Is enabled?';
+$string['enabledescription'] = 'Toggle to enable the plugin or disable the plugin in Moodle.';
+$string['modulelist'] = 'Module List:';
+$string['modulelistsettingtext'] = 'Section to provide list of modules to include in OBU Attendance plugin. Leave empty to import all modules';
+$string['activityintro'] = 'Default activity description:';
+$string['activityintrosettingtext'] = 'The description text when generating a course attendance activity.';
+

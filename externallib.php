@@ -26,6 +26,12 @@
 require_once($CFG->libdir . "/externallib.php");
 require_once($CFG->dirroot . "/mod/attendance/renderhelpers.php");
 require_once($CFG->dirroot . "/mod/attendance/classes/structure.php");
+require_once($CFG->dirroot . "/mod/attendance/locallib.php");
+require_once($CFG->dirroot . "/course/modlib.php");
+require_once($CFG->dirroot . "/group/lib.php");
+require_once($CFG->dirroot . "/local/obu_timetable_usergroups/lib.php");
+require_once($CFG->dirroot . "/local/obu_metalinking/lib.php");
+
 
 class local_attendance_ws_external extends external_api {
 
@@ -71,9 +77,40 @@ class local_attendance_ws_external extends external_api {
 		if (!($course = $DB->get_record('course', array('idnumber' => $params['idnumber'])))) {
 			return array('result' => -2);
 		}
-		
-		if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module attendance')))) {
-			return array('result' => -3);
+
+        $course = get_teaching_course($course);
+
+		if (!$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'))) {
+
+            list($module, $courseContext) = can_add_moduleinfo($course, 'attendance', 1);
+            self::validate_context($courseContext);
+            require_capability('mod/attendance:addinstance', $courseContext);
+
+            // Populate modinfo object.
+            $moduleinfo = new stdClass();
+            $moduleinfo->modulename = 'attendance';
+            $moduleinfo->module = $module->id;
+            $moduleinfo->name = 'Module Attendance';
+
+            if($defaultIntro = get_config('local_attendance_ws', 'activity_intro')) {
+                $moduleinfo->intro = $defaultIntro;
+                $moduleinfo->showdescription = 1;
+            }
+            else {
+                $moduleinfo->intro = '';
+                $moduleinfo->showdescription = 0;
+            }
+            $moduleinfo->introformat = FORMAT_HTML;
+
+            $moduleinfo->section = 1;
+            $moduleinfo->visible = 1;
+            $moduleinfo->visibleoncoursepage = 1;
+            $moduleinfo->cmidnumber = '';
+            $moduleinfo->groupmode = VISIBLEGROUPS;
+            $moduleinfo->groupingid = 0;
+
+            // Add the module to the course.
+            add_moduleinfo($moduleinfo, $course);
 		}
 
 		if (!($cm = get_coursemodule_from_instance('attendance', $attendance->id, 0, false))) {
@@ -95,7 +132,10 @@ class local_attendance_ws_external extends external_api {
 		if ($params['group'] == 0) {
 			$session->description = '';
 		} else {
-			$session->description = 'Group ' . $params['group'];
+            $group = get_usergroup($course->id, $params['group'], $params['semesterInstance'], $params['semesterName']);
+
+            $session->groupid = $group->id;
+			$session->description = $group->name;
 		}
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
@@ -164,7 +204,7 @@ class local_attendance_ws_external extends external_api {
 		if (!($session = $DB->get_record('attendance_sessions', array('id' => $params['sessionid'])))) {
 			return array('result' => 0);
 		}
-		
+
 		if (!($cm = get_coursemodule_from_instance('attendance', $session->attendanceid, 0, false))) {
 			return array('result' => -2);
 		}
@@ -234,7 +274,7 @@ class local_attendance_ws_external extends external_api {
 		if (!($session = $DB->get_record('attendance_sessions', array('id' => $params['sessionid'])))) {
 			return array('result' => 0);
 		}
-		
+
 		if (!($cm = get_coursemodule_from_instance('attendance', $session->attendanceid, 0, false))) {
 			return array('result' => -2);
 		}
