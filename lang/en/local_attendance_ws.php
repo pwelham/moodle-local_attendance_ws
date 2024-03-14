@@ -34,3 +34,5 @@ $string['enable'] = 'Is enabled?';
 $string['enabledescription'] = 'Toggle to enable the plugin or disable the plugin in Moodle.';
 $string['modulelist'] = 'Module List:';
 $string['modulelistsettingtext'] = 'Section to provide list of modules to include in OBU Attendance plugin.';
+$string['activityintro'] = 'Default activity description:';
+$string['activityintrosettingtext'] = 'The description text when generating a course attendance activity.';

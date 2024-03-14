@@ -92,7 +92,14 @@ class local_attendance_ws_external extends external_api {
             $moduleinfo->module = $module->id;
 
             $moduleinfo->name = 'Module Attendance';
-            $moduleinfo->intro = '';
+            if($defaultIntro = get_config('local_attendance_ws', 'activity_intro')) {
+                $moduleinfo->intro = $defaultIntro;
+                $moduleinfo->showdescription = 1;
+            }
+            else {
+                $moduleinfo->intro = '';
+                $moduleinfo->showdescription = 0;
+            }
             $moduleinfo->introformat = FORMAT_HTML;
 
             $moduleinfo->section = 1;

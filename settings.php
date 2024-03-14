@@ -31,4 +31,5 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', $settings);
     $settings->add(new admin_setting_configcheckbox('local_attendance_ws/enable', get_string('enable', 'local_attendance_ws'), get_string('enabledescription', 'local_attendance_ws'), ''));
     $settings->add(new admin_setting_configtextarea('local_attendance_ws/module_list', get_string('modulelist', 'local_attendance_ws'), get_string('modulelistsettingtext', 'local_attendance_ws'), ''));
+    $settings->add(new admin_setting_confightmleditor('local_attendance_ws/activity_intro', get_string('activityintro', 'local_attendance_ws'), get_string('activityintrosettingtext', 'local_attendance_ws'), ''));
 }
