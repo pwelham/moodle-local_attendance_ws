@@ -32,7 +32,6 @@ require_once($CFG->dirroot . "/group/lib.php");
 require_once($CFG->dirroot . "/local/obu_timetable_usergroups/lib.php");
 require_once($CFG->dirroot . "/local/obu_metalinking/lib.php");
 
-
 class local_attendance_ws_external extends external_api {
 
 	public static function add_session_parameters() {
@@ -40,8 +39,10 @@ class local_attendance_ws_external extends external_api {
 			array(
 				'idnumber' => new external_value(PARAM_TEXT, 'Course ID number'),
 				'group' => new external_value(PARAM_TEXT, 'Group'),
-				'start' => new external_value(PARAM_INT, 'Session start time'),
-				'duration' => new external_value(PARAM_INT, 'Session duration')
+                'start' => new external_value(PARAM_INT, 'Session start time'),
+                'duration' => new external_value(PARAM_INT, 'Session duration'),
+                'semesterName' => new external_value(PARAM_TEXT, 'Semester name'),
+                'semesterInstance' => new external_value(PARAM_INT, 'Semester instance')
 			)
 		);
 	}
@@ -54,7 +55,7 @@ class local_attendance_ws_external extends external_api {
 		);
 	}
 
-	public static function add_session($idnumber, $group, $start, $duration) {
+	public static function add_session($idnumber, $group, $start, $duration, $semesterName, $semesterInstance) {
 		global $DB;
 
 		// Context validation
@@ -66,7 +67,9 @@ class local_attendance_ws_external extends external_api {
 				'idnumber' => $idnumber,
 				'group' => $group,
 				'start' => $start,
-				'duration' => $duration
+                'duration' => $duration,
+                'semesterName' => $semesterName,
+                'semesterInstance' => $semesterInstance
 			)
 		);
 
@@ -113,9 +116,15 @@ class local_attendance_ws_external extends external_api {
             add_moduleinfo($moduleinfo, $course);
 		}
 
+        if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance')))) {
+            return array('result' => -3);
+        }
+
 		if (!($cm = get_coursemodule_from_instance('attendance', $attendance->id, 0, false))) {
 			return array('result' => -4);
 		}
+
+        $pluginconfig = get_config('attendance');
 
 		// Capability checking
 		$context = context_module::instance($cm->id);
@@ -123,28 +132,72 @@ class local_attendance_ws_external extends external_api {
 
 		$session = new stdClass();
 		$session->attendanceid = $attendance->id;
-		$session->groupid = 0;
 		$session->sessdate = $params['start'];
 		$session->duration = $params['duration'];
 		$session->lasttaken = null;
 		$session->lasttakenby = 0;
 		$session->timemodified = time();
-		if ($params['group'] == 0) {
+
+		if ($params['group'] == '0') {
+            $session->groupid = 0;
 			$session->description = '';
 		} else {
-            $group = get_usergroup($course->id, $params['group'], $params['semesterInstance'], $params['semesterName']);
+            $groupidnumber = get_timetable_usergroup_id($params['group'], $params['semesterInstance']);
+            if (!($group = $DB->get_record('groups', array('courseid'=>$course->id, 'idnumber'=>$groupidnumber)))) {
+                $userGroup = new stdClass();
+                $userGroup->name = get_timetable_usergroup_name($params['group'], $params['semesterName']);
+                $userGroup->idnumber = $groupidnumber;
+                $userGroup->description_editor = FORMAT_HTML;
+                $userGroup->enrolmentkey = '';
+                $userGroup->enablemessaging = '0';
+                $userGroup->id = 0;
+                $userGroup->courseid = $course->id;
 
+                $group = new stdClass();
+                $group->id = groups_create_group($userGroup);
+                $group->name = $userGroup->name;
+            }
             $session->groupid = $group->id;
 			$session->description = $group->name;
 		}
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
-		if (!empty(get_config('attendance', 'studentscanmark'))) { // Students will be able to mark their own attendance
-			$session->studentscanmark = 1;
-		} else {
-			$session->studentscanmark = 0;
-		}
-		$session->caleventid = 0;
+        $session->calendarevent = 0;
+        if (isset($pluginconfig->calendarevent_default)) {
+            $session->caleventid = $pluginconfig->calendarevent_default;
+        }
+        if (isset($pluginconfig->studentscanmark_default)) {
+            $session->studentscanmark = $pluginconfig->studentscanmark_default;
+        }
+        if (isset($pluginconfig->randompassword_default)) {
+            $session->randompassword = $pluginconfig->randompassword_default;
+        }
+        if (isset($pluginconfig->includeqrcode_default)) {
+            $session->includeqrcode = $pluginconfig->includeqrcode_default;
+        }
+        if (isset($pluginconfig->autoassignstatus)) {
+            $session->autoassignstatus = $pluginconfig->autoassignstatus;
+        }
+        if (isset($pluginconfig->allowupdatestatus_default)) {
+            $session->allowupdatestatus = $pluginconfig->allowupdatestatus_default;
+        }
+        if (isset($pluginconfig->rotateqrcode_default)) {
+            $session->rotateqrcode = $pluginconfig->rotateqrcode_default;
+        }
+        if (isset($pluginconfig->automark_default)) {
+            $session->automark = $pluginconfig->automark_default;
+        }
+        if (isset($pluginconfig->studentsearlyopentime)) {
+            $session->studentsearlyopentime = $pluginconfig->studentsearlyopentime;
+        }
+
+        if (!empty($session->randompassword)) {
+            $session->studentpassword = attendance_random_string();
+        }
+        if (!empty($session->rotateqrcode)) {
+            $session->studentpassword = attendance_random_string();
+            $session->rotateqrcodesecret = attendance_random_string();
+        }
 
 		$session->id = $DB->insert_record('attendance_sessions', $session);
 		attendance_create_calendar_event($session);
@@ -299,4 +352,28 @@ class local_attendance_ws_external extends external_api {
 
 		return array('result' => $params['sessionid']);
 	}
+
+    public static function get_settings_parameters() {
+        return new external_function_parameters(
+            array(
+            )
+        );
+    }
+
+    public static function get_settings_returns() {
+        return new external_single_structure(
+            array(
+                'enabled' => new external_value(PARAM_BOOL, 'Enabled'),
+                'modulelist' => new external_multiple_structure(new external_value(PARAM_TEXT, 'Module List'))
+            )
+        );
+    }
+
+    public static function get_settings(){
+        $enabled = get_config('local_attendance_ws', 'enable');
+        $modulelist = get_config('local_attendance_ws', 'module_list');
+        $modulesarray = array_filter(explode(",", str_replace(" ", "", $modulelist)));
+
+        return array('enabled' => $enabled, 'modulelist' => $modulesarray);
+    }
 }

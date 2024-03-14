@@ -19,13 +19,12 @@
  * Version info
  *
  * @package    local_attendance_ws
- * @author     Peter Welham
- * @copyright  2018, Oxford Brookes University {@link http://www.brookes.ac.uk/}
+ * @author     Emir Kamel
+ * @copyright  2023, Oxford Brookes University {@link http://www.brookes.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 
 $plugin->component = 'local_attendance_ws';
 $plugin->version = 2024011600;
@@ -36,4 +35,3 @@ $plugin->dependencies = array(
     'local_obu_timetable_usergroups' => 2024010800,
     'local_obu_metalinking' => 2024012300
 );
-

@@ -19,8 +19,8 @@
  * Language strings
  *
  * @package    local_attendance_ws
- * @author     Peter Welham
- * @copyright  2018, Oxford Brookes University {@link http://www.brookes.ac.uk/}
+ * @author     Emir Kamel
+ * @copyright  2023, Oxford Brookes University {@link http://www.brookes.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
