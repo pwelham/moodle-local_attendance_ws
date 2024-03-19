@@ -30,6 +30,7 @@ require_once($CFG->dirroot . "/mod/attendance/locallib.php");
 require_once($CFG->dirroot . "/course/modlib.php");
 require_once($CFG->dirroot . "/group/lib.php");
 require_once($CFG->dirroot . "/local/obu_timetable_usergroups/lib.php");
+require_once($CFG->dirroot . "/local/obu_metalinking/lib.php");
 
 class local_attendance_ws_external extends external_api {
 
@@ -80,9 +81,11 @@ class local_attendance_ws_external extends external_api {
 			return array('result' => -2);
 		}
 
+        $course = get_teaching_course($course);
+
 		if (!$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'))) {
 
-            list($module, $courseContext) = can_add_moduleinfo($course, 'attendance', 0);
+            list($module, $courseContext) = can_add_moduleinfo($course, 'attendance', 1);
             self::validate_context($courseContext);
             require_capability('mod/attendance:addinstance', $courseContext);
 
@@ -90,8 +93,8 @@ class local_attendance_ws_external extends external_api {
             $moduleinfo = new stdClass();
             $moduleinfo->modulename = 'attendance';
             $moduleinfo->module = $module->id;
-
             $moduleinfo->name = 'Module Attendance';
+
             if($defaultIntro = get_config('local_attendance_ws', 'activity_intro')) {
                 $moduleinfo->intro = $defaultIntro;
                 $moduleinfo->showdescription = 1;

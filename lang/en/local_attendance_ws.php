@@ -19,8 +19,8 @@
  * Language strings
  *
  * @package    local_attendance_ws
- * @author     Emir Kamel
- * @copyright  2023, Oxford Brookes University {@link http://www.brookes.ac.uk/}
+ * @author     Peter Welham
+ * @copyright  2018, Oxford Brookes University {@link http://www.brookes.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,6 +33,6 @@ $string['livesettings'] = 'Live Import Settings';
 $string['enable'] = 'Is enabled?';
 $string['enabledescription'] = 'Toggle to enable the plugin or disable the plugin in Moodle.';
 $string['modulelist'] = 'Module List:';
-$string['modulelistsettingtext'] = 'Section to provide list of modules to include in OBU Attendance plugin.';
+$string['modulelistsettingtext'] = 'Section to provide list of modules to include in OBU Attendance plugin. Leave empty to import all modules';
 $string['activityintro'] = 'Default activity description:';
 $string['activityintrosettingtext'] = 'The description text when generating a course attendance activity.';
