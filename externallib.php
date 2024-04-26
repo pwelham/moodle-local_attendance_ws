@@ -373,6 +373,6 @@ class local_attendance_ws_external extends external_api {
         $modulelist = get_config('local_attendance_ws', 'module_list');
         $modulesarray = array_filter(explode(",", str_replace(" ", "", $modulelist)));
 
-        return array('enabled' => $enabled, 'modulelist' => $modulesarray, 'salt' => $salt);
+        return array('enabled' => $enabled, 'modulelist' => $modulesarray);
     }
 }
