@@ -189,8 +189,8 @@ class local_attendance_ws_external extends external_api {
         }
 
         if (!empty($session->randompassword)) {
-            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], 6, $salt = "something");
-            $session->rotateqrcodesecret = attendance_hash($params['slotid'], $params['roomid'], 10, $salt = "something");
+            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $params['start'], 6, $salt = "something");
+            $session->rotateqrcodesecret = attendance_hash($params['slotid'], $params['roomid'], $params['start'],  10, $salt = "something");
         }
 //        if (!empty($session->rotateqrcode)) {
 //            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $salt = "something");

@@ -22,9 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
-function attendance_hash($slotid, $roomid, $length, $salt = ""): string
+function attendance_hash($slotid, $roomid, $eventdate, $length, $salt = ""): string
 {
-    $combination = $slotid . "_" .  $roomid . "_" . $salt;
+    $combination = $slotid . "_" .  $roomid . "_" . $eventdate . "_" . $salt;
 
     $hash = hash('sha256', $combination);
     $base64 = base64_encode($hash);
