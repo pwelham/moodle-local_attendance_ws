@@ -189,8 +189,9 @@ class local_attendance_ws_external extends external_api {
         }
 
         if (!empty($session->randompassword)) {
-            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $params['start'], 6, $salt = "something");
-            $session->rotateqrcodesecret = attendance_hash($params['slotid'], $params['roomid'], $params['start'],  10, $salt = "something");
+            $salt = get_config('local_attendance_ws', 'salt');
+            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $params['start'], 6, $salt);
+            $session->rotateqrcodesecret = attendance_hash($params['slotid'], $params['roomid'], $params['start'],  10, $salt);
         }
 //        if (!empty($session->rotateqrcode)) {
 //            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $salt = "something");
@@ -363,7 +364,6 @@ class local_attendance_ws_external extends external_api {
             array(
                 'enabled' => new external_value(PARAM_BOOL, 'Enabled'),
                 'modulelist' => new external_multiple_structure(new external_value(PARAM_TEXT, 'Module List')),
-                'salt' => new external_value(PARAM_TEXT, 'Salt')
             )
         );
     }
@@ -372,7 +372,6 @@ class local_attendance_ws_external extends external_api {
         $enabled = get_config('local_attendance_ws', 'enable');
         $modulelist = get_config('local_attendance_ws', 'module_list');
         $modulesarray = array_filter(explode(",", str_replace(" ", "", $modulelist)));
-        $salt = get_config('local_attendance_ws', 'salt');
 
         return array('enabled' => $enabled, 'modulelist' => $modulesarray, 'salt' => $salt);
     }
