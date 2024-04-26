@@ -24,25 +24,13 @@
  */
 
 require_once($CFG->libdir . "/externallib.php");
+require_once($CFG->libdir . "/locallib.php");
 require_once($CFG->dirroot . "/mod/attendance/renderhelpers.php");
 require_once($CFG->dirroot . "/mod/attendance/classes/structure.php");
 require_once($CFG->dirroot . "/mod/attendance/locallib.php");
 require_once($CFG->dirroot . "/course/modlib.php");
 require_once($CFG->dirroot . "/group/lib.php");
 require_once($CFG->dirroot . "/local/obu_timetable_usergroups/lib.php");
-
-function attendance_hash($slotid, $roomid, $salt){
-    if ($salt){
-        $salt = uniqid();
-        $combination = $slotid . $roomid . $salt;
-    }
-
-    $combination = $slotid . $roomid;
-    $hash = substr(hash('sha256', $combination), 0 ,6);
-    $base64 = base64_encode($hash);
-
-    return substr(preg_replace("/[^a-z0-9]/", "", $base64), 0 , 6);
-}
 
 class local_attendance_ws_external extends external_api {
 
@@ -201,12 +189,13 @@ class local_attendance_ws_external extends external_api {
         }
 
         if (!empty($session->randompassword)) {
-            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $salt = FALSE);
+            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], 6, $salt = "something");
+            $session->rotateqrcodesecret = attendance_hash($params['slotid'], $params['roomid'], 10, $salt = "something");
         }
-        if (!empty($session->rotateqrcode)) {
-            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $salt = FALSE);
-            $session->rotateqrcodesecret = attendance_hash($params['slotid'], $params['roomid'], $salt = FALSE);
-        }
+//        if (!empty($session->rotateqrcode)) {
+//            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $salt = "something");
+//            $session->rotateqrcodesecret = attendance_hash($params['slotid'], $params['roomid'], $salt = "something");
+//        }
 
 		$session->id = $DB->insert_record('attendance_sessions', $session);
 		attendance_create_calendar_event($session);
@@ -373,7 +362,8 @@ class local_attendance_ws_external extends external_api {
         return new external_single_structure(
             array(
                 'enabled' => new external_value(PARAM_BOOL, 'Enabled'),
-                'modulelist' => new external_multiple_structure(new external_value(PARAM_TEXT, 'Module List'))
+                'modulelist' => new external_multiple_structure(new external_value(PARAM_TEXT, 'Module List')),
+                'salt' => new external_value(PARAM_TEXT, 'Salt')
             )
         );
     }
@@ -382,7 +372,8 @@ class local_attendance_ws_external extends external_api {
         $enabled = get_config('local_attendance_ws', 'enable');
         $modulelist = get_config('local_attendance_ws', 'module_list');
         $modulesarray = array_filter(explode(",", str_replace(" ", "", $modulelist)));
+        $salt = get_config('local_attendance_ws', 'salt');
 
-        return array('enabled' => $enabled, 'modulelist' => $modulesarray);
+        return array('enabled' => $enabled, 'modulelist' => $modulesarray, 'salt' => $salt);
     }
 }

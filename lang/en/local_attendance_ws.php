@@ -34,3 +34,5 @@ $string['enable'] = 'Is enabled?';
 $string['enabledescription'] = 'Toggle to enable the plugin or disable the plugin in Moodle.';
 $string['modulelist'] = 'Module List:';
 $string['modulelistsettingtext'] = 'Section to provide list of modules to include in OBU Attendance plugin.';
+$string['salt'] = 'Salt:';
+$string['modulelistsettingtext'] = 'Section to provide salt to be used in hashing function for OBU Attendance plugin.';
