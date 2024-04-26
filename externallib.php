@@ -24,7 +24,7 @@
  */
 
 require_once($CFG->libdir . "/externallib.php");
-require_once($CFG->libdir . "/locallib.php");
+require_once("locallib.php");
 require_once($CFG->dirroot . "/mod/attendance/renderhelpers.php");
 require_once($CFG->dirroot . "/mod/attendance/classes/structure.php");
 require_once($CFG->dirroot . "/mod/attendance/locallib.php");
@@ -76,6 +76,7 @@ class local_attendance_ws_external extends external_api {
                 'semesterInstance' => $semesterInstance
 			)
 		);
+
 
 		if (strlen($params['idnumber']) < 1 || strlen($params['slotid']) < 1 || strlen($params['roomid']) < 1) {
 			return array('result' => -1);
@@ -373,6 +374,6 @@ class local_attendance_ws_external extends external_api {
         $modulelist = get_config('local_attendance_ws', 'module_list');
         $modulesarray = array_filter(explode(",", str_replace(" ", "", $modulelist)));
 
-        return array('enabled' => $enabled, 'modulelist' => $modulesarray, 'salt' => $salt);
+        return array('enabled' => $enabled, 'modulelist' => $modulesarray);
     }
 }
