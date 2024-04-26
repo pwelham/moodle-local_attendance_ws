@@ -31,12 +31,27 @@ require_once($CFG->dirroot . "/course/modlib.php");
 require_once($CFG->dirroot . "/group/lib.php");
 require_once($CFG->dirroot . "/local/obu_timetable_usergroups/lib.php");
 
+function attendance_hash($slotid, $roomid, $salt){
+    if ($salt){
+        $salt = uniqid();
+        $combination = $slotid . $roomid . $salt;
+    }
+
+    $combination = $slotid . $roomid;
+    $hash = substr(hash('sha256', $combination), 0 ,6);
+    $base64 = base64_encode($hash);
+
+    return substr(preg_replace("/[^a-z0-9]/", "", $base64), 0 , 6);
+}
+
 class local_attendance_ws_external extends external_api {
 
 	public static function add_session_parameters() {
 		return new external_function_parameters(
 			array(
 				'idnumber' => new external_value(PARAM_TEXT, 'Course ID number'),
+                'slotid' => new external_value(PARAM_TEXT, 'Slot ID number'),
+                'roomid' => new external_value(PARAM_TEXT, 'Room ID number'),
 				'group' => new external_value(PARAM_TEXT, 'Group'),
                 'start' => new external_value(PARAM_INT, 'Session start time'),
                 'duration' => new external_value(PARAM_INT, 'Session duration'),
@@ -54,7 +69,7 @@ class local_attendance_ws_external extends external_api {
 		);
 	}
 
-	public static function add_session($idnumber, $group, $start, $duration, $semesterName, $semesterInstance) {
+	public static function add_session($idnumber, $slotid, $roomid, $group, $start, $duration, $semesterName, $semesterInstance) {
 		global $DB;
 
 		// Context validation
@@ -64,6 +79,8 @@ class local_attendance_ws_external extends external_api {
 		$params = self::validate_parameters(
 			self::add_session_parameters(), array(
 				'idnumber' => $idnumber,
+                'slotid' => $slotid,
+                'roomid' => $roomid,
 				'group' => $group,
 				'start' => $start,
                 'duration' => $duration,
@@ -72,7 +89,7 @@ class local_attendance_ws_external extends external_api {
 			)
 		);
 
-		if (strlen($params['idnumber']) < 1) {
+		if (strlen($params['idnumber']) < 1 || strlen($params['slotid']) < 1 || strlen($params['roomid']) < 1) {
 			return array('result' => -1);
 		}
 
@@ -122,6 +139,8 @@ class local_attendance_ws_external extends external_api {
 
 		$session = new stdClass();
 		$session->attendanceid = $attendance->id;
+        $session->slotid = $params['slotid'];
+        $session->roomid = $params['roomid'];
 		$session->sessdate = $params['start'];
 		$session->duration = $params['duration'];
 		$session->lasttaken = null;
@@ -182,11 +201,11 @@ class local_attendance_ws_external extends external_api {
         }
 
         if (!empty($session->randompassword)) {
-            $session->studentpassword = attendance_random_string();
+            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $salt = FALSE);
         }
         if (!empty($session->rotateqrcode)) {
-            $session->studentpassword = attendance_random_string();
-            $session->rotateqrcodesecret = attendance_random_string();
+            $session->studentpassword = attendance_hash($params['slotid'], $params['roomid'], $salt = FALSE);
+            $session->rotateqrcodesecret = attendance_hash($params['slotid'], $params['roomid'], $salt = FALSE);
         }
 
 		$session->id = $DB->insert_record('attendance_sessions', $session);
