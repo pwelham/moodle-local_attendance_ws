@@ -31,5 +31,5 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', $settings);
     $settings->add(new admin_setting_configcheckbox('local_attendance_ws/enable', get_string('enable', 'local_attendance_ws'), get_string('enabledescription', 'local_attendance_ws'), ''));
     $settings->add(new admin_setting_configtextarea('local_attendance_ws/module_list', get_string('modulelist', 'local_attendance_ws'), get_string('modulelistsettingtext', 'local_attendance_ws'), ''));
-    $settings->add(new admin_setting_configtextarea('local_attendance_ws/salt', get_string('salt', 'local_attendance_ws'), get_string('saltsettingtext', 'local_attendance_ws'), ''));
+    $settings->add(new admin_setting_configtext('local_attendance_ws/salt', get_string('salt', 'local_attendance_ws'), get_string('saltsettingtext', 'local_attendance_ws'), ''));
 }
