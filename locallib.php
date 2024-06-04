@@ -22,7 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
-function attendance_hash($slotid, $roomid, $eventdate, $length, $salt = ""): string
+
+function local_attendance_ws_password_hash($slotid, $roomid, $eventdate, $length, $salt = ""): string
 {
     $combination = $slotid . "_" .  $roomid . "_" . $eventdate . "_" . $salt;
 
@@ -32,4 +33,14 @@ function attendance_hash($slotid, $roomid, $eventdate, $length, $salt = ""): str
     $password = substr(preg_replace("/[^a-z0-9]/", "", $base64), 0 , $length);
 
     return str_pad($password, $length, "0");
+}
+
+function local_attendance_ws_session_instance_code($slotid, $roomid, $eventdate): string
+{
+    $combination = $slotid . "_" .  $roomid . "_" . $eventdate;
+    $base64 = base64_encode($combination);
+
+    $encode = substr(preg_replace("/[^a-z0-9]/", "", $base64), 0 , 62);
+
+    return $encode;
 }
