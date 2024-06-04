@@ -27,11 +27,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_attendance_ws';
-$plugin->version = 2024032000;
+$plugin->version = 2024060401;
 $plugin->requires = 2012120301;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.2.0'; //Optional - Human-readable version name
+$plugin->release = 'v1.3.0'; //Optional - Human-readable version name
 $plugin->dependencies = array(
-    'local_obu_timetable_usergroups' => 2024010800,
-    'local_obu_metalinking' => 2024012300
+    'mod_attendance' => 2023020108, // OBU Customisation fork
+    'local_obu_metalinking' => 2024012300,
+    'local_obu_group_manager' => 2024060401
 );
