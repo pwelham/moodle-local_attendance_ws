@@ -29,7 +29,6 @@ require_once($CFG->dirroot . "/mod/attendance/classes/structure.php");
 require_once($CFG->dirroot . "/mod/attendance/locallib.php");
 require_once($CFG->dirroot . "/course/modlib.php");
 require_once($CFG->dirroot . "/group/lib.php");
-require_once($CFG->dirroot . "/local/obu_timetable_usergroups/lib.php");
 
 class local_attendance_ws_external extends external_api {
 
@@ -132,10 +131,12 @@ class local_attendance_ws_external extends external_api {
             $session->groupid = 0;
 			$session->description = '';
 		} else {
-            $groupidnumber = get_timetable_usergroup_id($params['group'], $params['semesterInstance']);
+            // This is okay as the WS is not currently in use
+            $groupidnumber = 'TODO'; //get_timetable_usergroup_id($params['group'], $params['semesterInstance']);
             if (!($group = $DB->get_record('groups', array('courseid'=>$course->id, 'idnumber'=>$groupidnumber)))) {
                 $userGroup = new stdClass();
-                $userGroup->name = get_timetable_usergroup_name($params['group'], $params['semesterName']);
+                // This is okay as the WS is not currently in use
+                $userGroup->name = 'TODO'; //get_timetable_usergroup_name($params['group'], $params['semesterName']);
                 $userGroup->idnumber = $groupidnumber;
                 $userGroup->description_editor = FORMAT_HTML;
                 $userGroup->enrolmentkey = '';
