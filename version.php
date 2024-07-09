@@ -27,9 +27,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_attendance_ws';
-$plugin->version = 2024011600;
+$plugin->version = 2024070900;
 $plugin->requires = 2012120301;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.1.0'; //Optional - Human-readable version name
+$plugin->release = 'v1.1.1';
 $plugin->dependencies = array('local_obu_timetable_usergroups' => 2024010800);
 
