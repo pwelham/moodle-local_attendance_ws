@@ -30,12 +30,8 @@ require_once($CFG->dirroot . "/mod/attendance/classes/structure.php");
 require_once($CFG->dirroot . "/mod/attendance/locallib.php");
 require_once($CFG->dirroot . "/course/modlib.php");
 require_once($CFG->dirroot . "/group/lib.php");
-<<<<<<< HEAD
 require_once($CFG->dirroot . "/local/obu_metalinking/lib.php");
 require_once($CFG->dirroot . "/local/obu_group_manager/lib.php");
-
-=======
->>>>>>> master
 
 class local_attendance_ws_external extends external_api {
 
@@ -149,31 +145,9 @@ class local_attendance_ws_external extends external_api {
             $session->groupid = 0;
 			$session->description = '';
 		} else {
-<<<<<<< HEAD
             $usergroup = local_obu_group_manager_create_system_group($course, null, null, $semesterName, $group);
             $session->groupid = $usergroup->id;
 			$session->description = $usergroup->name;
-=======
-            // This is okay as the WS is not currently in use
-            $groupidnumber = 'TODO'; //get_timetable_usergroup_id($params['group'], $params['semesterInstance']);
-            if (!($group = $DB->get_record('groups', array('courseid'=>$course->id, 'idnumber'=>$groupidnumber)))) {
-                $userGroup = new stdClass();
-                // This is okay as the WS is not currently in use
-                $userGroup->name = 'TODO'; //get_timetable_usergroup_name($params['group'], $params['semesterName']);
-                $userGroup->idnumber = $groupidnumber;
-                $userGroup->description_editor = FORMAT_HTML;
-                $userGroup->enrolmentkey = '';
-                $userGroup->enablemessaging = '0';
-                $userGroup->id = 0;
-                $userGroup->courseid = $course->id;
-
-                $group = new stdClass();
-                $group->id = groups_create_group($userGroup);
-                $group->name = $userGroup->name;
-            }
-            $session->groupid = $group->id;
-			$session->description = $group->name;
->>>>>>> master
 		}
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
