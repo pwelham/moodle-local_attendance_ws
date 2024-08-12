@@ -82,11 +82,11 @@ class local_attendance_ws_external extends external_api {
 			return array('result' => -2);
 		}
 
-        $course = local_obu_metalinking_get_teaching_course($course);
+        $teachingcourse = local_obu_metalinking_get_teaching_course($course);
 
-		if (!$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'))) {
+		if (!$DB->get_record('attendance', array('course' => $teachingcourse->id, 'name' => 'Module Attendance'))) {
 
-            list($module, $courseContext) = can_add_moduleinfo($course, 'attendance', 1);
+            list($module, $courseContext) = can_add_moduleinfo($teachingcourse, 'attendance', 1);
             self::validate_context($courseContext);
             require_capability('mod/attendance:addinstance', $courseContext);
 
@@ -114,10 +114,10 @@ class local_attendance_ws_external extends external_api {
             $moduleinfo->groupingid = 0;
 
             // Add the module to the course.
-            add_moduleinfo($moduleinfo, $course);
+            add_moduleinfo($moduleinfo, $teachingcourse);
 		}
 
-        if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance')))) {
+        if (!($attendance = $DB->get_record('attendance', array('course' => $teachingcourse->id, 'name' => 'Module Attendance')))) {
             return array('result' => -3);
         }
 
@@ -141,14 +141,12 @@ class local_attendance_ws_external extends external_api {
 		$session->lasttakenby = 0;
 		$session->timemodified = time();
 
-		if ($params['group'] == '0' || $params['group'] == '') {
-            $session->groupid = 0;
-			$session->description = '';
-		} else {
-            $usergroup = local_obu_group_manager_create_system_group($course, null, null, $semesterName, $group);
-            $session->groupid = $usergroup->id;
-			$session->description = $usergroup->name;
-		}
+        $usergroup = ($params['group'] == '0' || $params['group'] == '')
+            ? local_obu_group_manager_create_system_group($course, null, null, null, null, $teachingcourse)
+            : local_obu_group_manager_create_system_group($course, null, null, $semesterName, $group, $teachingcourse);
+
+        $session->groupid = $usergroup->id;
+        $session->description = $usergroup->name;
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
         $session->calendarevent = 0;

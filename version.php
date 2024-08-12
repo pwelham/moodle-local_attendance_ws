@@ -27,13 +27,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_attendance_ws';
-$plugin->version = 2024070901;
+$plugin->version = 2024081201;
 $plugin->requires = 2012120301;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.3.1';
+$plugin->release = 'v1.4.0';
 $plugin->dependencies = array(
     'mod_attendance' => 2024070301, // OBU Customisation fork
     'local_obu_metalinking' => 2024012300,
-    'local_obu_group_manager' => 2024060401
+    'local_obu_group_manager' => 2024081201
 );
 
