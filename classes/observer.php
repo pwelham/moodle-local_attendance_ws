@@ -45,20 +45,20 @@ class local_attendance_observer
      */
     public static function enrol_instance_created(\core\event\enrol_instance_created $event)
     {
-        $enabled = get_config('local_attendance_ws', 'enableevents');
-        if (!$enabled) {
-            return;
-        }
-
-        $instance = $event->get_record_snapshot('enrol', $event->objectid);
-        if (strcasecmp($instance->enrol, 'meta') != 0) {
-            return;
-        }
-
-        $task = new \local_attendance_ws\task\synchronize();
-        $task->set_custom_data(['courseid' => $instance->courseid]);
-
-        \core\task\manager::queue_adhoc_task($task);
+//        $enabled = get_config('local_attendance_ws', 'enableevents');
+//        if (!$enabled) {
+//            return;
+//        }
+//
+//        $instance = $event->get_record_snapshot('enrol', $event->objectid);
+//        if (strcasecmp($instance->enrol, 'meta') != 0) {
+//            return;
+//        }
+//
+//        $task = new \local_attendance_ws\task\synchronize();
+//        $task->set_custom_data(['courseid' => $instance->courseid]);
+//
+//        \core\task\manager::queue_adhoc_task($task);
     }
 
     /**
@@ -69,19 +69,19 @@ class local_attendance_observer
      */
     public static function enrol_instance_deleted(\core\event\enrol_instance_deleted $event)
     {
-        $enabled = get_config('local_attendance_ws', 'enableevents');
-        if (!$enabled) {
-            return;
-        }
-
-        global $DB;
-
-        $instance = $event->get_record_snapshot('enrol', $event->objectid);
-
-        if (strcasecmp($instance->enrol, 'meta') == 0) {
-            $course = get_course($instance->courseid);
-
-            // TODO :
-        }
+//        $enabled = get_config('local_attendance_ws', 'enableevents');
+//        if (!$enabled) {
+//            return;
+//        }
+//
+//        global $DB;
+//
+//        $instance = $event->get_record_snapshot('enrol', $event->objectid);
+//
+//        if (strcasecmp($instance->enrol, 'meta') == 0) {
+//            $course = get_course($instance->courseid);
+//
+//            // TODO :
+//        }
     }
 }

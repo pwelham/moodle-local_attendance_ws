@@ -114,7 +114,6 @@ class local_attendance_ws_external extends external_api {
         $session->groupid = $usergroup->id;
 
         $session->description = "Room(s): " . $params['roomid'];
-        $session->description = $usergroup->name;
 
  		$session->descriptionformat = 1;
 		$session->statusset = 0;

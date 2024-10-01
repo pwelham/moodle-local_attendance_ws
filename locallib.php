@@ -96,23 +96,23 @@ function local_attendance_ws_find_attendance_activity($course) {
     return $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'));
 }
 
-function local_attendance_ws_meta_course_sync($trace, $childid) {
-    // Find the parent course id
-    $parentid = local_obu_metalinking_get_teaching_course_id($childid);
-
-    // Find the parent attendance activity
-    $activity =
-
-    // Move all the attendance sessions to the parent attendance activity
-
-}
-
-function local_attendance_ws_meta_course_return($trace, $courseId) {
-    // Find the child course id
-
-    // Find the child attendance activity
-
-    // Find the child course attendance sessions (by assoc Group id number)
-
-    // Move all the attendance sessions to the child attendance activity
-}
+//function local_attendance_ws_meta_course_sync($trace, $childid) {
+//    // Find the parent course id
+//    $parentid = local_obu_metalinking_get_teaching_course_id($childid);
+//
+//    // Find the parent attendance activity
+//    $activity =
+//
+//    // Move all the attendance sessions to the parent attendance activity
+//
+//}
+//
+//function local_attendance_ws_meta_course_return($trace, $courseId) {
+//    // Find the child course id
+//
+//    // Find the child attendance activity
+//
+//    // Find the child course attendance sessions (by assoc Group id number)
+//
+//    // Move all the attendance sessions to the child attendance activity
+//}

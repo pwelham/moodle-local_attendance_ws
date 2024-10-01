@@ -36,10 +36,10 @@ class synchronize extends \core\task\adhoc_task {
      * @return void
      */
     public function execute() {
-        $course = get_course($this->get_custom_data()->courseid);
-
-        $trace = new \text_progress_trace();
-        local_attendance_ws_meta_course_sync($trace, $course->id);
-        $trace->finished();
+//        $course = get_course($this->get_custom_data()->courseid);
+//
+//        $trace = new \text_progress_trace();
+//        local_attendance_ws_meta_course_sync($trace, $course->id);
+//        $trace->finished();
     }
 }
