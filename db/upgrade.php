@@ -81,7 +81,7 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
         $sql = "UPDATE {attendance_sessions} s1
                 INNER JOIN {attendance_sessions} s2
                 SET s1.description = s2.roomid
-                WHERE s2.Roomid IS NOT NULL AND s2.Roomid <> ''";
+                WHERE s2.roomid IS NOT NULL AND s2.roomid <> ''";
 
         $DB->execute($sql);
 
