@@ -79,33 +79,8 @@ class local_attendance_ws_external extends external_api {
 			return array('result' => -2);
 		}
 
-		if (!$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'))) {
-
-            list($module, $courseContext) = can_add_moduleinfo($course, 'attendance', 0);
-            self::validate_context($courseContext);
-            require_capability('mod/attendance:addinstance', $courseContext);
-
-            // Populate modinfo object.
-            $moduleinfo = new stdClass();
-            $moduleinfo->modulename = 'attendance';
-            $moduleinfo->module = $module->id;
-
-            $moduleinfo->name = 'Module Attendance';
-            $moduleinfo->intro = '';
-            $moduleinfo->introformat = FORMAT_HTML;
-
-            $moduleinfo->section = 1;
-            $moduleinfo->visible = 1;
-            $moduleinfo->visibleoncoursepage = 1;
-            $moduleinfo->cmidnumber = '';
-            $moduleinfo->groupmode = VISIBLEGROUPS;
-            $moduleinfo->groupingid = 0;
-
-            // Add the module to the course.
-            add_moduleinfo($moduleinfo, $course);
-		}
-
-        if (!($attendance = $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance')))) {
+        $teachingcourse = local_obu_metalinking_get_teaching_course($course);
+        if (!($attendance = local_attendance_ws_find_attendance_activity($teachingcourse))) {
             return array('result' => -3);
         }
 
@@ -127,30 +102,13 @@ class local_attendance_ws_external extends external_api {
 		$session->lasttakenby = 0;
 		$session->timemodified = time();
 
-		if ($params['group'] == '0') {
-            $session->groupid = 0;
-			$session->description = '';
-		} else {
-            // This is okay as the WS is not currently in use
-            $groupidnumber = 'TODO'; //get_timetable_usergroup_id($params['group'], $params['semesterInstance']);
-            if (!($group = $DB->get_record('groups', array('courseid'=>$course->id, 'idnumber'=>$groupidnumber)))) {
-                $userGroup = new stdClass();
-                // This is okay as the WS is not currently in use
-                $userGroup->name = 'TODO'; //get_timetable_usergroup_name($params['group'], $params['semesterName']);
-                $userGroup->idnumber = $groupidnumber;
-                $userGroup->description_editor = FORMAT_HTML;
-                $userGroup->enrolmentkey = '';
-                $userGroup->enablemessaging = '0';
-                $userGroup->id = 0;
-                $userGroup->courseid = $course->id;
 
-                $group = new stdClass();
-                $group->id = groups_create_group($userGroup);
-                $group->name = $userGroup->name;
-            }
-            $session->groupid = $group->id;
-			$session->description = $group->name;
-		}
+        $usergroup = ($params['group'] == '0' || $params['group'] == '')
+            ? local_obu_group_manager_create_system_group($course, null, null, null, null, $teachingcourse)
+            : local_obu_group_manager_create_system_group($course, null, null, $semesterName, $group, $teachingcourse);
+
+        $session->groupid = $usergroup->id;
+        $session->description = "Room(s): " . $params['roomid'];
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
         $session->calendarevent = 0;
