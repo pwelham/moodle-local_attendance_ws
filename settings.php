@@ -37,4 +37,5 @@ if ($hassiteconfig) {
         'local_attendance_ws/enableevents',
         get_string('enableevents', 'local_attendance_ws'),
         get_string('enableeventsdescription', 'local_attendance_ws'), true));
+
 }

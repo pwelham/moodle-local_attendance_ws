@@ -115,5 +115,4 @@ function local_attendance_ws_meta_course_return($trace, $courseId) {
     // Find the child course attendance sessions (by assoc Group id number)
 
     // Move all the attendance sessions to the child attendance activity
-
 }

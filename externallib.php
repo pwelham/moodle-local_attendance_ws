@@ -24,11 +24,14 @@
  */
 
 require_once($CFG->libdir . "/externallib.php");
+require_once($CFG->dirroot . "/local/attendance_ws/locallib.php");
 require_once($CFG->dirroot . "/mod/attendance/renderhelpers.php");
 require_once($CFG->dirroot . "/mod/attendance/classes/structure.php");
 require_once($CFG->dirroot . "/mod/attendance/locallib.php");
 require_once($CFG->dirroot . "/course/modlib.php");
 require_once($CFG->dirroot . "/group/lib.php");
+require_once($CFG->dirroot . "/local/obu_metalinking/lib.php");
+require_once($CFG->dirroot . "/local/obu_group_manager/lib.php");
 
 class local_attendance_ws_external extends external_api {
 
@@ -36,11 +39,12 @@ class local_attendance_ws_external extends external_api {
 		return new external_function_parameters(
 			array(
 				'idnumber' => new external_value(PARAM_TEXT, 'Course ID number'),
+                'slotid' => new external_value(PARAM_TEXT, 'Slot ID number'),
+                'roomid' => new external_value(PARAM_TEXT, 'Room ID number'),
 				'group' => new external_value(PARAM_TEXT, 'Group'),
                 'start' => new external_value(PARAM_INT, 'Session start time'),
                 'duration' => new external_value(PARAM_INT, 'Session duration'),
-                'semesterName' => new external_value(PARAM_TEXT, 'Semester name'),
-                'semesterInstance' => new external_value(PARAM_INT, 'Semester instance')
+                'semesterName' => new external_value(PARAM_TEXT, 'Semester name')
 			)
 		);
 	}
@@ -53,25 +57,24 @@ class local_attendance_ws_external extends external_api {
 		);
 	}
 
-	public static function add_session($idnumber, $group, $start, $duration, $semesterName, $semesterInstance) {
+	public static function add_session($idnumber, $slotid, $roomid, $group, $start, $duration, $semesterName) {
 		global $DB;
 
-		// Context validation
 		self::validate_context(context_system::instance());
-
-		// Parameter validation
 		$params = self::validate_parameters(
 			self::add_session_parameters(), array(
 				'idnumber' => $idnumber,
+                'slotid' => $slotid,
+                'roomid' => $roomid,
 				'group' => $group,
 				'start' => $start,
                 'duration' => $duration,
-                'semesterName' => $semesterName,
-                'semesterInstance' => $semesterInstance
+                'semesterName' => $semesterName
 			)
 		);
 
-		if (strlen($params['idnumber']) < 1) {
+
+		if (strlen($params['idnumber']) < 1 || strlen($params['slotid']) < 1 || strlen($params['roomid']) < 1) {
 			return array('result' => -1);
 		}
 
@@ -96,22 +99,31 @@ class local_attendance_ws_external extends external_api {
 
 		$session = new stdClass();
 		$session->attendanceid = $attendance->id;
+        $session->timetableeventid = $params['slotid'];
+        $session->roomid = $params['roomid'];
 		$session->sessdate = $params['start'];
 		$session->duration = $params['duration'];
 		$session->lasttaken = null;
 		$session->lasttakenby = 0;
 		$session->timemodified = time();
 
-
         $usergroup = ($params['group'] == '0' || $params['group'] == '')
             ? local_obu_group_manager_create_system_group($course, null, null, null, null, $teachingcourse)
             : local_obu_group_manager_create_system_group($course, null, null, $semesterName, $group, $teachingcourse);
 
         $session->groupid = $usergroup->id;
+
         $session->description = "Room(s): " . $params['roomid'];
+        $session->description = $usergroup->name;
+
  		$session->descriptionformat = 1;
 		$session->statusset = 0;
         $session->calendarevent = 0;
+
+        $salt = get_config('local_attendance_ws', 'salt');
+        $session->studentpassword = local_attendance_ws_password_hash($params['slotid'], $params['roomid'], $params['start'], 6, $salt);
+        $session->sessioninstancecode = local_attendance_ws_session_instance_code($params['slotid'], $params['roomid'], $params['start']);
+
         if (isset($pluginconfig->calendarevent_default)) {
             $session->caleventid = $pluginconfig->calendarevent_default;
         }
@@ -139,13 +151,9 @@ class local_attendance_ws_external extends external_api {
         if (isset($pluginconfig->studentsearlyopentime)) {
             $session->studentsearlyopentime = $pluginconfig->studentsearlyopentime;
         }
-
-        if (!empty($session->randompassword)) {
-            $session->studentpassword = attendance_random_string();
-        }
         if (!empty($session->rotateqrcode)) {
-            $session->studentpassword = attendance_random_string();
-            $session->rotateqrcodesecret = attendance_random_string();
+            $session->studentpassword = local_attendance_ws_password_hash($params['slotid'], $params['roomid'], $params['start'], 6, $salt);
+            $session->rotateqrcodesecret = local_attendance_ws_password_hash($params['slotid'], $params['roomid'], $params['start'], 6, $salt);
         }
 
 		$session->id = $DB->insert_record('attendance_sessions', $session);
@@ -187,10 +195,7 @@ class local_attendance_ws_external extends external_api {
 	public static function update_session($sessionid, $start, $duration) {
 		global $DB;
 
-		// Context validation
 		self::validate_context(context_system::instance());
-
-		// Parameter validation
 		$params = self::validate_parameters(
 			self::update_session_parameters(), array(
 				'sessionid' => $sessionid,
@@ -259,10 +264,7 @@ class local_attendance_ws_external extends external_api {
 	public static function delete_session($sessionid) {
 		global $DB;
 
-		// Context validation
 		self::validate_context(context_system::instance());
-
-		// Parameter validation
 		$params = self::validate_parameters(
 			self::delete_session_parameters(), array(
 				'sessionid' => $sessionid
@@ -313,7 +315,7 @@ class local_attendance_ws_external extends external_api {
         return new external_single_structure(
             array(
                 'enabled' => new external_value(PARAM_BOOL, 'Enabled'),
-                'modulelist' => new external_multiple_structure(new external_value(PARAM_TEXT, 'Module List'))
+                'modulelist' => new external_multiple_structure(new external_value(PARAM_TEXT, 'Module List')),
             )
         );
     }
