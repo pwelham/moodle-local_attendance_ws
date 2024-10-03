@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,25 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Version info
- *
- * @package    local_attendance_ws
- * @author     Peter Welham
- * @copyright  2017, Oxford Brookes University {@link http://www.brookes.ac.uk/}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace local_attendance_ws\task;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_attendance_ws';
-$plugin->version = 2024100201;
-$plugin->requires = 2012120301;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.4.2';
-$plugin->dependencies = array(
-    'mod_attendance' => 2024070301, // OBU Customisation fork
-    'local_obu_metalinking' => 2024012300,
-    'local_obu_group_manager' => 2024100301
-);
+global $CFG;
+require_once($CFG->dirroot . '/local/attendance_ws/locallib.php');
 
+/**
+ * Adhoc task to perform group synchronization
+ *
+ * @package    local_metagroups
+ * @copyright  2018 Paul Holden <paulh@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class desynchronize extends \core\task\adhoc_task {
+
+    /**
+     * Execute the desynchronize task
+     *
+     * @return void
+     */
+    public function execute() {
+        $trace = new \text_progress_trace();
+        local_attendance_ws_meta_course_return($trace,
+            $this->get_custom_data()->parentid,
+            $this->get_custom_data()->childid);
+        $trace->finished();
+    }
+}

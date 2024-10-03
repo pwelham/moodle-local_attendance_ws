@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/local/obu_metalining/lib.php');
+require_once($CFG->dirroot . '/local/obu_group_manager/lib.php');
 require_once($CFG->dirroot . "/course/modlib.php");
 
 function local_attendance_ws_password_hash($slotid, $roomid, $eventdate, $length, $salt = ""): string
@@ -51,10 +52,10 @@ function local_attendance_ws_session_instance_code($slotid, $roomid, $eventdate)
     return $encode;
 }
 
-function local_attendance_ws_find_attendance_activity($course) {
+function local_attendance_ws_find_attendance_activity($course, $create=true) {
     global $DB;
 
-    if (!$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'))) {
+    if ($create && !$DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'))) {
 
         list($module, $courseContext) = can_add_moduleinfo($course, 'attendance', 1);
 
@@ -96,23 +97,50 @@ function local_attendance_ws_find_attendance_activity($course) {
     return $DB->get_record('attendance', array('course' => $course->id, 'name' => 'Module Attendance'));
 }
 
-//function local_attendance_ws_meta_course_sync($trace, $childid) {
-//    // Find the parent course id
-//    $parentid = local_obu_metalinking_get_teaching_course_id($childid);
-//
-//    // Find the parent attendance activity
-//    $activity =
-//
-//    // Move all the attendance sessions to the parent attendance activity
-//
-//}
-//
-//function local_attendance_ws_meta_course_return($trace, $courseId) {
-//    // Find the child course id
-//
-//    // Find the child attendance activity
-//
-//    // Find the child course attendance sessions (by assoc Group id number)
-//
-//    // Move all the attendance sessions to the child attendance activity
-//}
+function local_attendance_ws_meta_course_sync($trace, $parentid, $childid) {
+    global $DB;
+
+    $childcourse = $DB->get_record('course', array('id' => $childid));
+    if (!($childactivity = local_attendance_ws_find_attendance_activity($childcourse, false))) {
+        $trace->output("No child attendance activity to migrate");
+        return;
+    }
+
+    $parentcourse = $DB->get_record('course', array('id' => $parentid));
+    $parentactivity = local_attendance_ws_find_attendance_activity($parentcourse);
+
+    local_attendance_ws_change_session_course($trace, $childactivity, $parentactivity);
+
+}
+
+function local_attendance_ws_meta_course_return($trace, $parentid, $childid) {
+    global $DB;
+
+    $parentcourse = $DB->get_record('course', array('id' => $parentid));
+    if (!($parentactivity = local_attendance_ws_find_attendance_activity($parentcourse, false))) {
+        $trace->output("No parent attendance activity to migrate");
+        return;
+    }
+
+    $childcourse = $DB->get_record('course', array('id' => $childid));
+    $childactivity = local_attendance_ws_find_attendance_activity($childcourse);
+
+    local_attendance_ws_change_session_course($trace, $parentactivity, $childactivity);
+}
+
+function local_attendance_ws_change_session_course($trace, $fromactivity, $toactivity) {
+    global $DB;
+
+
+    $sql = "
+        UPDATE {attendance_sessions} as
+        SET attendanceid = ?
+        INNER JOIN {groups} g
+        WHERE attendanceid = ? AND g.idnumber LIKE ?
+    ";
+
+    $fromcourse = get_course($fromactivity);
+    $groupidnumber = local_obu_group_manager_get_idnumber_prefix($fromcourse->idnumber) . "%";
+
+    $DB->execute($sql, [$toactivity, $fromactivity, $groupidnumber]);
+}
