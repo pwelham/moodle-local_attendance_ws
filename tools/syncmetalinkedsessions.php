@@ -8,7 +8,7 @@ require_once("$CFG->libdir/formslib.php");
 
 admin_externalpage_setup('attendancewstaskssync');
 
-global $DB, $PAGE, $OUTPUT;
+global $PAGE, $OUTPUT;
 
 $PAGE->set_heading("Sync Metalinked Sessions");
 echo $OUTPUT->header();
@@ -26,6 +26,7 @@ class syncmetalinkedsessions_form extends moodleform {
 }
 
 function reSyncMetalinkedSessions($sessionsafter) : int {
+    global $DB;
 
     $sql = "SELECT DISTINCT
                 c.id AS 'childid',
