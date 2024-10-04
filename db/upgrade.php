@@ -87,6 +87,6 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
 
         upgrade_plugin_savepoint(true, 2024100201, 'local', 'attendance_ws');
     }
-    
+
     return $result;
 }
