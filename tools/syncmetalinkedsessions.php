@@ -47,8 +47,9 @@ function reSyncMetalinkedSessions($sessionsafter) : int {
     if(count($records) > 0) {
         foreach ($records as $record) {
             $task = new \local_attendance_ws\task\synchronize();
-            $task->set_custom_data(['childid' => $record->childid]);
-            $task->set_custom_data(['parentid' => $record->parentid]);
+            $task->set_custom_data([
+                'childid' => $record->childid,
+                'parentid' => $record->parentid]);
 
             \core\task\manager::queue_adhoc_task($task);
         }
