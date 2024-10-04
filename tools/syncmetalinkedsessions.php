@@ -45,14 +45,14 @@ function reSyncMetalinkedSessions($sessionsafter) : int {
     $records = $DB->get_records_sql($sql, array($sessionsafter));
 
     if(count($records) > 0) {
-        foreach ($records as $record) {
-            $task = new \local_attendance_ws\task\synchronize();
-            $task->set_custom_data([
-                'childid' => $record->childid,
-                'parentid' => $record->parentid]);
-
-            \core\task\manager::queue_adhoc_task($task);
-        }
+//        foreach ($records as $record) {
+//            $task = new \local_attendance_ws\task\synchronize();
+//            $task->set_custom_data([
+//                'childid' => $record->childid,
+//                'parentid' => $record->parentid]);
+//
+//            \core\task\manager::queue_adhoc_task($task);
+//        }
     }
 
     return count($records);
