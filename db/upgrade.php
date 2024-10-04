@@ -77,15 +77,15 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
 //        upgrade_plugin_savepoint(true, 2024092301, 'local', 'attendance_ws');
 //    }
 
-    if ($oldversion < 2024100101) {
+    if ($oldversion < 2024100102) {
         $sql = "UPDATE {attendance_sessions} s1
-                INNER JOIN {attendance_sessions} s2
+                INNER JOIN {attendance_sessions} s2 ON s1.id = s2.id
                 SET s1.description = s2.roomid
                 WHERE s2.roomid IS NOT NULL AND s2.roomid <> ''";
 
         $DB->execute($sql);
 
-        upgrade_plugin_savepoint(true, 2024100101, 'local', 'attendance_ws');
+        upgrade_plugin_savepoint(true, 2024100102, 'local', 'attendance_ws');
     }
 
     return $result;
