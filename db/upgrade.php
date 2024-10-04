@@ -62,7 +62,8 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
 
     if ($oldversion < 2024100201) {
         $sql = "SELECT DISTINCT
-                c.id AS 'courseid'
+                c.id AS 'childid',
+                parent.id AS 'parentid'
                 FROM {attendance_sessions} s
                 INNER JOIN {attendance} a ON s.attendanceid = a.id
                 INNER JOIN {course} c ON a.course = c.id
@@ -79,7 +80,8 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
         if(count($records) > 0) {
             foreach ($records as $record) {
                 $task = new \local_attendance_ws\task\synchronize();
-                $task->set_custom_data(['courseid' => $record->courseid]);
+                $task->set_custom_data(['childid' => $record->childid]);
+                $task->set_custom_data(['parentid' => $record->parentid]);
 
                 \core\task\manager::queue_adhoc_task($task);
             }

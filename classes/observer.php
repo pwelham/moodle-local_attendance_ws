@@ -75,8 +75,6 @@ class local_attendance_observer
             return;
         }
 
-        global $DB;
-
         $instance = $event->get_record_snapshot('enrol', $event->objectid);
         if (strcasecmp($instance->enrol, 'meta') != 0) {
             return;
