@@ -60,35 +60,5 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2024100103, 'local', 'attendance_ws');
     }
 
-    if ($oldversion < 2024100201) {
-        $sql = "SELECT DISTINCT
-                c.id AS 'childid',
-                parent.id AS 'parentid'
-                FROM {attendance_sessions} s
-                INNER JOIN {attendance} a ON s.attendanceid = a.id
-                INNER JOIN {course} c ON a.course = c.id
-                INNER JOIN {enrol} e ON e.customint1 = c.id
-                INNER JOIN {course} parent ON e.courseid = parent.id
-                INNER JOIN {course_categories} cat ON cat.id = parent.category AND cat.idnumber LIKE 'SRS%'
-                WHERE e.enrol = 'meta'
-                AND parent.shortname LIKE '% (%:%)'
-                AND parent.idnumber LIKE '%.%'
-                AND s.sessdate > UNIX_TIMESTAMP()";
-
-        $records = $DB->get_records_sql($sql);
-
-        if(count($records) > 0) {
-            foreach ($records as $record) {
-                $task = new \local_attendance_ws\task\synchronize();
-                $task->set_custom_data(['childid' => $record->childid]);
-                $task->set_custom_data(['parentid' => $record->parentid]);
-
-                \core\task\manager::queue_adhoc_task($task);
-            }
-        }
-
-        upgrade_plugin_savepoint(true, 2024100201, 'local', 'attendance_ws');
-    }
-
     return $result;
 }

@@ -26,9 +26,12 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+global $CFG, $ADMIN;
+
 if ($hassiteconfig) {
+    $settingscat = new admin_category('attendancewstasks', get_string('plugintitle', 'local_attendance_ws'));
+
     $settings = new admin_settingpage(get_string('pluginname', 'local_attendance_ws'), get_string('plugintitle', 'local_attendance_ws'));
-    $ADMIN->add('localplugins', $settings);
     $settings->add(new admin_setting_configcheckbox('local_attendance_ws/enable', get_string('enable', 'local_attendance_ws'), get_string('enabledescription', 'local_attendance_ws'), ''));
     $settings->add(new admin_setting_configtextarea('local_attendance_ws/module_list', get_string('modulelist', 'local_attendance_ws'), get_string('modulelistsettingtext', 'local_attendance_ws'), ''));
     $settings->add(new admin_setting_confightmleditor('local_attendance_ws/activity_intro', get_string('activityintro', 'local_attendance_ws'), get_string('activityintrosettingtext', 'local_attendance_ws'), ''));
@@ -37,5 +40,15 @@ if ($hassiteconfig) {
         'local_attendance_ws/enableevents',
         get_string('enableevents', 'local_attendance_ws'),
         get_string('enableeventsdescription', 'local_attendance_ws'), true));
+
+
+    $settingscat->add('attendancewstasks', $settings);
+
+    $settingscat->add('attendancewstasks', new admin_externalpage(
+        'attendancewstaskssync',
+        'Sync metalinked sessions',
+        "$CFG->wwwroot/local/attendance_ws/tools/syncmetalinkedsessions.php"));
+
+    $ADMIN->add('localplugins', $settingscat);
 
 }
