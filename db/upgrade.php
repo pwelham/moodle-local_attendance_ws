@@ -49,15 +49,15 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2024090501, 'local', 'attendance_ws');
     }
 
-    if ($oldversion < 2024100101) {
+    if ($oldversion < 2024100103) {
         $sql = "UPDATE {attendance_sessions} s1
-                INNER JOIN {attendance_sessions} s2
-                SET s1.description = s2.roomid
+                INNER JOIN {attendance_sessions} s2 ON s1.id = s2.id
+                SET s1.description = CONCAT('Room(s): ', s2.roomid)
                 WHERE s2.roomid IS NOT NULL AND s2.roomid <> ''";
 
         $DB->execute($sql);
 
-        upgrade_plugin_savepoint(true, 2024100101, 'local', 'attendance_ws');
+        upgrade_plugin_savepoint(true, 2024100103, 'local', 'attendance_ws');
     }
 
     if ($oldversion < 2024100201) {
@@ -87,8 +87,6 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
 
         upgrade_plugin_savepoint(true, 2024100201, 'local', 'attendance_ws');
     }
-
-
-
+    
     return $result;
 }
