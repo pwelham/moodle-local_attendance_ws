@@ -25,7 +25,7 @@ class syncmetalinkedsessions_form extends moodleform {
     }
 }
 
-function reSyncMetalinkedSessions($sessionsafter) {
+function reSyncMetalinkedSessions($sessionsafter) : int {
 
     $sql = "SELECT DISTINCT
                 c.id AS 'childid',
@@ -59,7 +59,7 @@ function reSyncMetalinkedSessions($sessionsafter) {
 $mform = new syncmetalinkedsessions_form();
 
 if ($data = $mform->get_data()) {
-    $count = reSyncAllGroup($data->endafter);
+    $count = reSyncMetalinkedSessions($data->sessionsafter);
 
     \core\notification::info($count . " Ad hoc task(s) created");
 
