@@ -146,7 +146,7 @@ function local_attendance_ws_change_session_course($trace, $fromactivity, $toact
         : $fromcourse;
     $groupidnumber = local_obu_group_manager_get_idnumber_prefix($groupcourse->idnumber) . "%";
 
-    $results = $DB->get_records_sql($sql, array((int)$fromactivity->id), $groupidnumber);
+    $results = $DB->get_records_sql($sql, array((int)$fromactivity->id, $groupidnumber));
     foreach ($results as $result) {
         $group = local_obu_group_manager_create_system_group($tocourse, $result->name, $result->idnumber);
 
