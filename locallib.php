@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/local/obu_metalining/lib.php');
+require_once($CFG->dirroot . '/local/obu_metalinking/lib.php');
 require_once($CFG->dirroot . '/local/obu_group_manager/lib.php');
 require_once($CFG->dirroot . "/course/modlib.php");
 
