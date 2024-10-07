@@ -125,20 +125,37 @@ function local_attendance_ws_meta_course_return($trace, $parentid, $childid) {
     $childcourse = $DB->get_record('course', array('id' => $childid));
     $childactivity = local_attendance_ws_find_attendance_activity($childcourse);
 
-    local_attendance_ws_change_session_course($trace, $parentactivity, $childactivity);
+    local_attendance_ws_change_session_course($trace, $parentactivity, $childactivity, true);
 }
 
-function local_attendance_ws_change_session_course($trace, $fromactivity, $toactivity) {
+function local_attendance_ws_change_session_course($trace, $fromactivity, $toactivity, $return = false) {
     global $DB;
 
+    // SELECT the sessions to move
     $sql = "
-        UPDATE {attendance_sessions} s
-        INNER JOIN {groups} g ON s.groupid = g.id
-        SET s.attendanceid = ?
+        SELECT s.id, g.name, g.idnumber
+        FROM {attendance_sessions} s
+        LEFT JOIN {groups} g ON s.groupid = g.id 
         WHERE s.attendanceid = ? AND " . $DB->sql_like('g.idnumber','?');
 
     $fromcourse = get_course($fromactivity->course);
-    $groupidnumber = local_obu_group_manager_get_idnumber_prefix($fromcourse->idnumber) . "%";
+    $tocourse = get_course($toactivity->course);
 
-    $DB->execute($sql, array((int)$toactivity->id,(int)$fromactivity->id, $groupidnumber));
+    $groupcourse = $return
+        ? $tocourse
+        : $fromcourse;
+    $groupidnumber = local_obu_group_manager_get_idnumber_prefix($groupcourse->idnumber) . "%";
+
+    $results = $DB->get_records_sql($sql, array((int)$fromactivity->id), $groupidnumber);
+    foreach ($results as $result) {
+        $group = local_obu_group_manager_create_system_group($tocourse, $result->name, $result->idnumber)
+
+        $sql = "
+            UPDATE {attendance_sessions} s
+            INNER JOIN {groups} g ON s.groupid = g.id
+            SET s.attendanceid = ?, s.groupid = ?
+            WHERE s.id = ?";
+
+        $DB->execute($sql, array((int)$toactivity->id, $group->id, $result->id));
+    }
 }
