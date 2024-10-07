@@ -7,6 +7,10 @@ require('../../../config.php');
 
 global $CFG;
 
+if(!is_siteadmin()) {
+    return;
+}
+
 $childid = required_param('childid', PARAM_INT);
 $parentid = required_param('parentid', PARAM_INT);
 

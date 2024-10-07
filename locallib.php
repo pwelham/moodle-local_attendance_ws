@@ -131,16 +131,14 @@ function local_attendance_ws_meta_course_return($trace, $parentid, $childid) {
 function local_attendance_ws_change_session_course($trace, $fromactivity, $toactivity) {
     global $DB;
 
-
     $sql = "
-        UPDATE {attendance_sessions} as
-        SET attendanceid = ?
-        INNER JOIN {groups} g
-        WHERE attendanceid = ? AND g.idnumber LIKE ?
-    ";
+        UPDATE {attendance_sessions} s
+        INNER JOIN {groups} g ON s.groupid = g.id
+        SET s.attendanceid = ?
+        WHERE s.attendanceid = ? AND " . $DB->sql_like('g.idnumber','?');
 
-    $fromcourse = get_course($fromactivity);
+    $fromcourse = get_course($fromactivity->course);
     $groupidnumber = local_obu_group_manager_get_idnumber_prefix($fromcourse->idnumber) . "%";
 
-    $DB->execute($sql, [$toactivity, $fromactivity, $groupidnumber]);
+    $DB->execute($sql, array((int)$toactivity->id,(int)$fromactivity->id, $groupidnumber));
 }
