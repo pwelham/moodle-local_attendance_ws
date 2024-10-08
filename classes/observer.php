@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/local/attendance_ws/locallib.php');
  * @copyright  2024 Joe Souch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_attendance_observer
+class local_attendance_ws_observer
 {
 
     /**

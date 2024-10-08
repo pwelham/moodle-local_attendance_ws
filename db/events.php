@@ -29,6 +29,7 @@ $observers = [
         'eventname' => '\core\event\enrol_instance_created',
         'callback'  => 'local_attendance_ws_observer::enrol_instance_created',
     ],
+
     [
         'eventname' => '\core\event\enrol_instance_deleted',
         'callback'  => 'local_attendance_ws_observer::enrol_instance_deleted',
