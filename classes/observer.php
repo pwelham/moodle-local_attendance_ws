@@ -56,8 +56,9 @@ class local_attendance_ws_observer
         }
 
         $task = new \local_attendance_ws\task\synchronize();
-        $task->set_custom_data(['parentid' => $instance->courseid]);
-        $task->set_custom_data(['childid' => $instance->customint1]);
+        $task->set_custom_data(array(
+            'parentid' => $instance->courseid,
+            'childid' => $instance->customint1));
 
         \core\task\manager::queue_adhoc_task($task);
     }
@@ -81,8 +82,9 @@ class local_attendance_ws_observer
         }
 
         $task = new \local_attendance_ws\task\desynchronize();
-        $task->set_custom_data(['parentid' => $instance->courseid]);
-        $task->set_custom_data(['childid' => $instance->customint1]);
+        $task->set_custom_data(array(
+            'parentid' => $instance->courseid,
+            'childid' => $instance->customint1));
 
         \core\task\manager::queue_adhoc_task($task);
 
