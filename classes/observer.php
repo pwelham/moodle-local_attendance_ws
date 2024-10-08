@@ -36,7 +36,6 @@ require_once($CFG->dirroot . '/local/attendance_ws/locallib.php');
  */
 class local_attendance_ws_observer
 {
-
     /**
      * Enrol instance created
      *
