@@ -109,7 +109,9 @@ function local_attendance_ws_meta_course_sync($trace, $parentid, $childid) {
     $parentcourse = $DB->get_record('course', array('id' => $parentid));
     $parentactivity = local_attendance_ws_find_attendance_activity($parentcourse);
 
-    local_attendance_ws_change_session_course($trace, $childactivity, $parentactivity);
+    $trace->output("Transferring sessions from $childcourse->shortname to $parentcourse->shortname.");
+
+    local_attendance_ws_change_session_course($trace, $childcourse, $childactivity, $parentcourse, $parentactivity, false);
 
 }
 
@@ -125,28 +127,25 @@ function local_attendance_ws_meta_course_return($trace, $parentid, $childid) {
     $childcourse = $DB->get_record('course', array('id' => $childid));
     $childactivity = local_attendance_ws_find_attendance_activity($childcourse);
 
-    local_attendance_ws_change_session_course($trace, $parentactivity, $childactivity, true);
+    $trace->output("Restoring sessions from $parentcourse->shortname to $childcourse->shortname.");
+
+    local_attendance_ws_change_session_course($trace, $parentcourse, $parentactivity, $childcourse, $childactivity, true);
 }
 
-function local_attendance_ws_change_session_course($trace, $fromactivity, $toactivity, $return = false) {
+function local_attendance_ws_change_session_course($trace, $fromcourse, $fromactivity, $tocourse, $toactivity, $return) {
     global $DB;
 
-    // SELECT the sessions to move
     $sql = "
         SELECT s.id, g.name, g.idnumber
         FROM {attendance_sessions} s
         LEFT JOIN {groups} g ON s.groupid = g.id 
         WHERE s.attendanceid = ? AND " . $DB->sql_like('g.idnumber','?');
 
-    $fromcourse = get_course($fromactivity->course);
-    $tocourse = get_course($toactivity->course);
-
-    $groupcourse = $return
-        ? $tocourse
-        : $fromcourse;
+    $groupcourse = $return ? $tocourse : $fromcourse;
     $groupidnumber = local_obu_group_manager_get_idnumber_prefix($groupcourse->idnumber) . "%";
 
     $results = $DB->get_records_sql($sql, array((int)$fromactivity->id, $groupidnumber));
+    $trace->output(count($results) . " sessions to move.");
     foreach ($results as $result) {
         $group = local_obu_group_manager_create_system_group($tocourse, $result->name, $result->idnumber);
 
@@ -157,5 +156,7 @@ function local_attendance_ws_change_session_course($trace, $fromactivity, $toact
             WHERE s.id = ?";
 
         $DB->execute($sql, array((int)$toactivity->id, $group->id, $result->id));
+
+        $trace->output("Session ($result->id) moved to $tocourse->shortname with group ($group->idnumber).");
     }
 }

@@ -37,9 +37,11 @@ class desynchronize extends \core\task\adhoc_task {
      */
     public function execute() {
         $trace = new \text_progress_trace();
+        $trace->output("Starting attendance session restore.");
         local_attendance_ws_meta_course_return($trace,
             $this->get_custom_data()->parentid,
             $this->get_custom_data()->childid);
+        $trace->output("Finished attendance session restore.");
         $trace->finished();
     }
 }

@@ -24,22 +24,25 @@ require_once($CFG->dirroot . '/local/attendance_ws/locallib.php');
 /**
  * Adhoc task to perform group synchronization
  *
- * @package    local_metagroups
- * @copyright  2018 Paul Holden <paulh@moodle.com>
+ * @package    local_attendance_ws
+ * @copyright  2024 Joe Souch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class synchronize extends \core\task\adhoc_task {
 
     /**
-     * Execute the synchronize task
+     * Execute the Synchronize task
      *
      * @return void
      */
     public function execute() {
         $trace = new \text_progress_trace();
+        $trace->output("Starting attendance session transfer.");
         local_attendance_ws_meta_course_sync($trace,
             $this->get_custom_data()->parentid,
             $this->get_custom_data()->childid);
+        $trace->output("Finished attendance session transfer.");
+
         $trace->finished();
     }
 }
