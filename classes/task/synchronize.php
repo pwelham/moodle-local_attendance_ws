@@ -38,10 +38,9 @@ class synchronize extends \core\task\adhoc_task {
     public function execute() {
         $trace = new \text_progress_trace();
         $trace->output("Starting attendance session transfer.");
-        $trace->output("Parent {$this->get_custom_data()->parentid}, Child {$this->get_custom_data()->childid}");
-//        local_attendance_ws_meta_course_sync($trace,
-//            $this->get_custom_data()->parentid,
-//            $this->get_custom_data()->childid);
+        local_attendance_ws_meta_course_sync($trace,
+            $this->get_custom_data()->parentid,
+            $this->get_custom_data()->childid);
         $trace->output("Finished attendance session transfer.");
 
         $trace->finished();
