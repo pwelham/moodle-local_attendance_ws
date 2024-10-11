@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use local_obu_metalinking_events\event\metalinking_groups_created;
+use local_obu_attendance_events\event\attendance_sessions_moved;
+use local_obu_attendance_events\event\attendance_sessions_restored;
+
 /**
  * Attendance Web Service file description here.
  *
@@ -39,27 +43,28 @@ class local_attendance_ws_observer
     /**
      * Enrol instance created
      *
-     * @param \core\event\enrol_instance_created $event
+     * @param metalinking_groups_created $event
      * @return void
      */
-    public static function enrol_instance_created(\core\event\enrol_instance_created $event)
+    public static function metalinking_groups_created(metalinking_groups_created $event)
     {
         $enabled = get_config('local_attendance_ws', 'enableevents');
         if (!$enabled) {
             return;
         }
 
-        $instance = $event->get_record_snapshot('enrol', $event->objectid);
-        if (strcasecmp($instance->enrol, 'meta') != 0) {
-            return;
-        }
+        $parentid = $event->other['parentid'];
+        $childid = $event->other['childid'];
 
         $task = new \local_attendance_ws\task\synchronize();
         $task->set_custom_data(array(
-            'parentid' => $instance->courseid,
-            'childid' => $instance->customint1));
+            'parentid' => $parentid,
+            'childid' => $childid));
 
         \core\task\manager::queue_adhoc_task($task);
+
+        $attendanceSessionsMoved = attendance_sessions_moved::create_from_metalinked_courses($childid, $parentid);
+        $attendanceSessionsMoved->trigger();
     }
 
     /**
@@ -80,13 +85,17 @@ class local_attendance_ws_observer
             return;
         }
 
+        $parentid = $instance->courseid;
+        $childid = $instance->customint1;
+
         $task = new \local_attendance_ws\task\desynchronize();
         $task->set_custom_data(array(
-            'parentid' => $instance->courseid,
-            'childid' => $instance->customint1));
+            'parentid' => $parentid,
+            'childid' => $childid));
 
         \core\task\manager::queue_adhoc_task($task);
 
-
+        $attendanceSessionsRestored = attendance_sessions_restored::create_from_metalinked_courses($childid, $parentid);
+        $attendanceSessionsRestored->trigger();
     }
 }

@@ -26,8 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname' => '\core\event\enrol_instance_created',
-        'callback'  => 'local_attendance_ws_observer::enrol_instance_created',
+        'eventname' => '\local_obu_metalinking_events\event\metalinking_groups_created',
+        'callback'  => 'local_attendance_ws_observer::metalinking_groups_created',
     ],
 
     [

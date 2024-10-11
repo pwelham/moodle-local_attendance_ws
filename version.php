@@ -34,6 +34,8 @@ $plugin->release = 'v1.4.2';
 $plugin->dependencies = array(
     'mod_attendance' => 2024070301, // OBU Customisation fork
     'local_obu_metalinking' => 2024012300,
-    'local_obu_group_manager' => 2024100301
+    'local_obu_group_manager' => 2024100301,
+    'local_obu_attendance_events' => 2024100901,
+    'local_obu_metalinking_events' => 2024100901
 );
 
