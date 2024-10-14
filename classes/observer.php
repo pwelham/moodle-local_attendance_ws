@@ -88,12 +88,8 @@ class local_attendance_ws_observer
         $parentid = $instance->courseid;
         $childid = $instance->customint1;
 
-        $task = new \local_attendance_ws\task\desynchronize();
-        $task->set_custom_data(array(
-            'parentid' => $parentid,
-            'childid' => $childid));
-
-        \core\task\manager::queue_adhoc_task($task);
+        $trace = new \null_progress_trace();
+        local_attendance_ws_meta_course_return($trace,$parentid,$childid);
 
         $attendanceSessionsRestored = attendance_sessions_restored::create_from_metalinked_courses($childid, $parentid);
         $attendanceSessionsRestored->trigger();
