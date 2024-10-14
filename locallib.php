@@ -144,6 +144,11 @@ function local_attendance_ws_change_session_course($trace, $fromcourse, $fromact
     $groupcourse = $return ? $tocourse : $fromcourse;
     $groupidnumber = local_obu_group_manager_get_idnumber_prefix($groupcourse->idnumber) . "%";
 
+
+    $trace->output("From activity id is: $fromactivity->id");
+    $trace->output("Group Id like query is : $groupidnumber");
+    $trace->output("SQL : " . $sql);
+
     $results = $DB->get_records_sql($sql, array((int)$fromactivity->id, $groupidnumber));
     $trace->output(count($results) . " sessions to move.");
     foreach ($results as $result) {
