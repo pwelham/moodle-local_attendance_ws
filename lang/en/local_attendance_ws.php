@@ -38,3 +38,6 @@ $string['activityintro'] = 'Default activity description:';
 $string['activityintrosettingtext'] = 'The description text when generating a course attendance activity.';
 $string['salt'] = 'Salt:';
 $string['saltsettingtext'] = 'Salt';
+$string['enableevents'] = 'Enable event capture';
+$string['enableeventsdescription'] = 'Toggle to enable the capturing of Moodle events to move child sessions onto the parent course when metalinked';
+

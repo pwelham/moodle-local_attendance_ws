@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,26 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version info
+ * Plugin event observers
  *
  * @package    local_attendance_ws
- * @author     Peter Welham
- * @copyright  2017, Oxford Brookes University {@link http://www.brookes.ac.uk/}
+ * @copyright  2014 Joe Souch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_attendance_ws';
-$plugin->version = 2024100901;
-$plugin->requires = 2012120301;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v1.4.2';
-$plugin->dependencies = array(
-    'mod_attendance' => 2024070301, // OBU Customisation fork
-    'local_obu_metalinking' => 2024012300,
-    'local_obu_group_manager' => 2024100301,
-    'local_obu_attendance_events' => 2024100901,
-    'local_obu_metalinking_events' => 2024100901
-);
+$observers = [
+    [
+        'eventname' => '\local_obu_metalinking_events\event\metalinking_groups_created',
+        'callback'  => 'local_attendance_ws_observer::metalinking_groups_created',
+    ],
 
+    [
+        'eventname' => '\core\event\enrol_instance_deleted',
+        'callback'  => 'local_attendance_ws_observer::enrol_instance_deleted',
+    ],
+];
