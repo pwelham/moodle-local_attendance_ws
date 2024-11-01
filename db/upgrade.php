@@ -60,17 +60,17 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2024100103, 'local', 'attendance_ws');
     }
 
-    if($oldversion < 2024110101) {
+    if($oldversion < 2024110102) {
         $sql = "SELECT DISTINCT 
                     c.id AS 'parentid',
                     e.customint1 AS 'childid'
                 FROM {enrol} e
                 JOIN {course} c ON c.id = e.courseid
-                JOIN {course_categories} cat ON cat.id = c.category AND cat.idnumber NOT LIKE 'SRS%'
+                JOIN {course_categories} cat ON cat.id = c.category
                 JOIN {attendance} a ON a.course = c.id
                 JOIN {attendance_sessions} s ON a.id = s.attendanceid AND (s.timetableeventid <> '' AND s.timetableeventid IS NOT NULL)
                 WHERE e.enrol = 'meta'
-                  AND (c.shortname LIKE '% (%:%)' OR c.idnumber LIKE '%.%' OR cat.idnumber NOT LIKE 'SRS%')
+                  AND (c.idnumber NOT LIKE '%.%' OR cat.idnumber NOT LIKE 'SRS%')
                   AND c.idnumber NOT LIKE '%ANML%'";
 
         $records = $DB->get_records_sql($sql);
@@ -80,7 +80,7 @@ function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
             local_attendance_ws_meta_course_return($trace,$record->parentid,$record->childid);
         }
 
-        upgrade_plugin_savepoint(true, 2024110101, 'local', 'attendance_ws');
+        upgrade_plugin_savepoint(true, 2024110102, 'local', 'attendance_ws');
     }
 
     return $result;
