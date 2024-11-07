@@ -178,7 +178,8 @@ class local_attendance_ws_external extends external_api {
 			array(
 				'sessionid' => new external_value(PARAM_INT, 'Session ID'),
 				'start' => new external_value(PARAM_INT, 'Session start time'),
-				'duration' => new external_value(PARAM_INT, 'Session duration')
+                'duration' => new external_value(PARAM_INT, 'Session duration'),
+                'roomid' => new external_value(PARAM_TEXT, 'Room Ids')
 			)
 		);
 	}
@@ -191,7 +192,7 @@ class local_attendance_ws_external extends external_api {
 		);
 	}
 
-	public static function update_session($sessionid, $start, $duration) {
+	public static function update_session($sessionid, $start, $duration, $roomid) {
 		global $DB;
 
 		self::validate_context(context_system::instance());
@@ -220,13 +221,10 @@ class local_attendance_ws_external extends external_api {
 		require_capability('mod/attendance:manageattendances', $context);
 
 		$session->sessdate = $params['start'];
-		$session->duration = $params['duration'];
+        $session->duration = $params['duration'];
+        $session->roomid = $params['roomid'];
 		$session->timemodified = time();
 		$DB->update_record('attendance_sessions', $session);
-
-		if ($session->caleventid) {
-			attendance_update_calendar_event($session->caleventid, $session->duration, $session->sessdate);
-		}
 
 		$event = \mod_attendance\event\session_updated::create(array(
 			'objectid' => $session->attendanceid,
