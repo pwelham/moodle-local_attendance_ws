@@ -27,7 +27,7 @@
  */
 global $CFG;
 require_once($CFG->dirroot.'/group/lib.php');
-require_once($CFG->dirroot.'/group/lib.php');
+require_once($CFG->dirroot.'/local/attendance_ws/locallib.php');
 
 function xmldb_local_attendance_ws_upgrade($oldversion = 0) {
     global $DB;
