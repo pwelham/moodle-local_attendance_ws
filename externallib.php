@@ -200,7 +200,8 @@ class local_attendance_ws_external extends external_api {
 			self::update_session_parameters(), array(
 				'sessionid' => $sessionid,
 				'start' => $start,
-				'duration' => $duration
+                'duration' => $duration,
+                'roomid' => $roomid
 			)
 		);
 
@@ -223,6 +224,7 @@ class local_attendance_ws_external extends external_api {
 		$session->sessdate = $params['start'];
         $session->duration = $params['duration'];
         $session->roomid = $params['roomid'];
+        $session->description = "Room(s): " . $params['roomid'];
 		$session->timemodified = time();
 		$DB->update_record('attendance_sessions', $session);
 
